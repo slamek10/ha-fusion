@@ -1,0 +1,48 @@
+action: fire-dom-event
+browser_mod:
+  service: browser_mod.popup
+  data:
+    title: Ventilator - kontrole
+    card_mod:
+      style:
+        #popup header
+        .:
+    content:
+      type: horizontal-stack
+      cards:
+        - show_name: true
+          show_icon: true
+          type: button
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            data:
+              entity_id: script.ventilator_ivan_off
+          icon: mdi:fan-off
+        - show_name: true
+          show_icon: true
+          type: button
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            data:
+              entity_id: script.ventilator_ivan_b1
+          icon: mdi:fan-speed-1
+        - show_name: true
+          show_icon: true
+          type: button
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            data:
+              entity_id: script.ventilator_ivan_b2
+          icon: mdi:fan-speed-2
+        - show_name: true
+          show_icon: true
+          type: button
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            data:
+              entity_id: script.ventilator_ivan_b3
+          icon: mdi:fan-speed-3

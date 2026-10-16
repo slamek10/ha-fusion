@@ -1,0 +1,9 @@
+default:
+  aspect_ratio: 1/1
+  styles:
+    card:
+      - border-radius: 10px
+      - box-shadow: none
+      - transition: none
+    name:
+      - font-size: 0.8em

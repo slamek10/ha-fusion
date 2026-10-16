@@ -1,0 +1,1 @@
+#layout.svelte-1uha8ag{grid-template-areas:"header header""aside nav""aside main";min-height:100vh;display:grid;overflow:hidden}@media (width<=768px){#layout.svelte-1uha8ag{grid-template-areas:"header header""aside aside""nav nav""main main";min-height:100vh;display:grid;overflow:hidden;grid-template-rows:auto auto auto 1fr!important}}

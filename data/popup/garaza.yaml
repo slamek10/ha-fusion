@@ -1,0 +1,16 @@
+action: fire-dom-event
+browser_mod:
+  service: browser_mod.popup
+  data:
+    title: Garaža
+    content:
+      type: vertical-stack
+      cards:
+        - show_name: true
+          show_icon: true
+          type: button
+          tap_action:
+            action: toggle
+          entity: cover.garaza
+          name: Garažna vrata
+          icon: mdi:garage

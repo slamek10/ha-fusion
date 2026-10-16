@@ -1,0 +1,5 @@
+locale: en
+popup_dir: /config/popup
+template_dir: /config/button_card_templates
+addons:
+  youtube: false

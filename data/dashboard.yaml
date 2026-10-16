@@ -1,0 +1,878 @@
+wallpanel:
+  enabled: true
+  hide_toolbar: false
+  hide_sidebar: true
+  fullscreen: false
+  idle_time: 10
+kiosk_mode:
+  non_admin_settings:
+    kiosk: true
+    ignore_entity_settings: true
+views:
+  - name: Kuća
+    id: 4676743618387
+    sections:
+      - name: Grijanje
+        items:
+          - id: 4661078368776
+            type: button
+            entity_id: climate.slamek_melcloudhome_eed5_1ccc_climate
+            name: Klima
+            popup_action: yaml
+            popup_file: footer_klime.yaml
+            shape: default
+            show_circle: true
+            col: 1
+          - id: 5226707809097
+            type: button
+            entity_id: climate.slameks_residence_zone_1_circuit_0_climate
+            name: Termostat
+            template:
+              service: |-
+                service: browser_mod.popup
+                data:
+                  content:
+                    type: custom:layout-card
+                    layout_type: custom:grid-layout
+                    cards:
+                      - type: thermostat
+                        name: Termostat
+                        entity: climate.thermostat
+                        features:
+                          - type: climate-hvac-modes
+                            hvac_modes:
+                              - "off"
+            button_template: light
+            popup_file: ventilator_is_soba.yaml
+            popup_action: yaml
+            popup_trigger: click
+            shape: default
+            col: 2
+        id: 5764570421993
+      - type: horizontal-stack
+        sections:
+          - name: Dnevna
+            items:
+              - id: 9168180667600
+                type: button
+                entity_id: cover.living_room_left_blind_cover_0
+                name: Roleta lijeva
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "open") %}
+                      Otvorena
+                    {% else %}
+                      Zatvorena
+                    {% endif %}
+              - id: 8539860502446
+                type: button
+                entity_id: cover.living_room_right_blind_cover_0
+                name: Roleta desna
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "open") %}
+                      Otvorena
+                    {% else %}
+                      Zatvorena
+                    {% endif %}
+              - id: 1449580049003
+                type: button
+                entity_id: cover.rolete_kuhinja
+                name: Klizna stijena
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "open") %}
+                      Otvorena
+                    {% else %}
+                      Zatvorena
+                    {% endif %}
+              - id: 2529785445912
+                type: button
+                entity_id: switch.dnevna_glavno_switch_0
+                name: Glavno svijetlo
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "open") %}
+                      Upaljeno
+                    {% else %}
+                      Ugašeno
+                    {% endif %}
+                more_info: false
+                button_template: light
+                show_circle: true
+                button_templates:
+                  - light
+                  - icon_hue
+                shape: default
+              - id: 1785533838578
+                type: button
+                entity_id: switch.dnevna_glavno_switch_1
+                name: Ambijentalno
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "on") %}
+                      Upaljeno
+                    {% else %}
+                      Ugašeno
+                    {% endif %}
+                more_info: false
+                col: 2
+              - id: 5468104631549
+                type: button
+                entity_id: vacuum.viomi_v8_f25d_robot_cleaner
+                more_info: false
+                template:
+                  service: |-
+                    service: browser_mod.popup
+                    data:
+                      title: Usisavač
+                      timeout: 300000
+                      style: |
+                        --popup-max-width: calc(385px + 495px);
+                        --primary-color: transparent; /* hide timeout progress */
+                      card_mod:
+                        style:
+                          # card divider border
+                          layout-card$grid-layout$: |
+                            #root {
+                              margin: -24px 0 !important;
+                            }
+                            hui-vertical-stack-card {
+                              border-right: 1.5px solid rgba(0, 0, 0, 0.2);
+                              border-radius: 0;
+                              transition: none;
+                            }
+                            /* phone */
+                            @media screen and (max-width: 800px) {
+                              hui-vertical-stack-card {
+                                border-right: none;
+                                border-bottom: 1.5px solid rgba(0, 0, 0, 0.2);
+                              }
+                            }
+                      content:
+                        type: custom:layout-card
+                        layout_type: custom:grid-layout
+                        layout:
+                          margin: 0
+                          grid-template-columns: 385px 495px
+                          grid-template-rows: 1fr
+                          grid-template-areas: |
+                            "info map"
+                          mediaquery:
+                            #phone
+                            "(max-width: 800px)":
+                              grid-template-columns: 1fr
+                              grid-template-rows: repeat(2, 1fr)
+                              grid-template-areas: |
+                                "info"
+                                "map"
+                        cards:
+
+                          ### Detalji
+
+                          - type: vertical-stack
+                            view_layout:
+                              grid-area: info
+                            cards:
+                            - type: entities
+                              title: Stanje
+                              card_mod:
+                                class: header
+                                style: |
+                                  .card-content {
+                                    padding: var(--tablet-popup-content-padding);
+                                    padding-bottom: 0;
+                                  }
+                              entities:
+
+                              - entity: vacuum.viomi_v8_f25d_robot_cleaner
+
+                              - type: custom:bar-card
+                                width: 55%
+                                height: 2em
+                                decimal: 0
+                                unit_of_measurement: '%'
+                                positions:
+                                  icon: outside
+                                  indicator: 'off'
+                                  name: outside
+                                severity:
+                                  - color: '#303435'
+                                    from: 11
+                                    to: 999
+                                  - color: '#6d2525'
+                                    from: 0
+                                    to: 10
+                                entity_row: true
+                                entities:
+                                  - entity: vacuum.viomi_v8_f25d_robot_cleaner
+                                    attribute: battery_level
+                                    name: Baterija
+                                    icon: mdi:battery
+                                  - entity: vacuum.viomi_v8_f25d_robot_cleaner
+                                    attribute: viomi_vacuum.main_brush_life
+                                    name: Glavna četka
+                                    icon:
+                                  - entity: vacuum.viomi_v8_f25d_robot_cleaner
+                                    attribute: viomi_vacuum.side_brush_life
+                                    name: Sakupljač
+                                    icon:
+                                  - entity: vacuum.viomi_v8_f25d_robot_cleaner
+                                    attribute: viomi_vacuum.mop_life
+                                    name: Krpa
+                                    icon:
+
+                              - type: custom:more-info-card
+                                entity: vacuum.viomi_v8_f25d_robot_cleaner
+                                card_mod:
+                                  style:
+                                    # hide everything but ha-select
+                                    .: |
+                                      h1, state-card-content {
+                                        display: none;
+                                      }
+                                      .card-content {
+                                        padding: 1.5em 0 0 0.7em;
+                                      }
+                                    more-info-vacuum$:
+                                      .: |
+                                        div.flex-horizontal>div, div:nth-child(2), ha-attributes {
+                                          display: none;
+                                        }
+                                        ha-select {
+                                          display: contents;
+                                        }
+                                      ha-select:
+                                        $:
+                                          # no icon so remove label inset
+                                          .: |
+                                            .mdc-floating-label {
+                                              inset-inline-start: 0 !important;
+                                            }
+                                          # fix transparent menu background color
+                                          mwc-menu$: |
+                                            mwc-list {
+                                              background: var(--card-background-color);
+                                            }
+
+                          ### Način čišćenja
+
+                          - type: custom:xiaomi-vacuum-map-card
+                            view_layout:
+                              grid-area: map
+                            card_mod:
+                              class: header
+                              style: |
+                                ha-card {
+                                  --map-card-primary-color: #FFFFFF10;
+                                  --map-card-secondary-color: none;
+                                  --map-card-secondary-text-color: #9da0a2;
+                                  --map-card-internal-big-radius: 0.6em !important;
+                                }
+                                div.map-wrapper, div.controls-wrapper {
+                                  padding: var(--tablet-popup-content-padding);
+                                  padding-top: 0;
+                                  padding-bottom: 0;
+                                  letter-spacing: normal;
+                                }
+                                div.tiles-wrapper, div.vacuum-controls, #map-zoomer-overlay {
+                                  display: none;
+                                }
+                                div.map-controls-wrapper {
+                                  padding-top: 24px;
+                                }
+                                paper-button {
+                                  --mdc-icon-size: 2em;
+                                  color: #9da0a2 !important;
+                                  padding: 0.42em;
+                                }        
+                            entity: vacuum.viomi_v8_f25d_robot_cleaner
+                            map_source:
+                              camera: camera.vacuum_map
+                            calibration_source:
+                              camera: true
+                            map_locked: true
+                            vacuum_platform: send_command  
+                            map_modes:
+
+                              - template: vacuum_goto
+                              - template: vacuum_clean_zone
+                  state: >-
+                    {% if is_state(entity_id, "on") %} Čišćenje
+
+
+                    {% elif (state_attr('vacuum.viomi_v8_f25d_robot_cleaner' ,
+                    'battery_level') == 100) %} Na docku
+
+
+                    {% elif (state_attr('vacuum.viomi_v8_f25d_robot_cleaner' ,
+                    'battery_level') < 100) %} Na punjenju
+
+
+                    {% endif %}
+                name: Usisavač
+                col: 3
+            id: 3601911784701
+          - name: Notifikacije
+            items:
+              - id: 1791445880023
+                type: waste_collection
+                category_id: komunalni
+                name: MKO
+                icon: mdi:trash-can
+                color: '#4CAF50'
+              - id: 1791445881490
+                type: waste_collection
+                category_id: plastika
+                name: Plastika
+                icon: mdi:recycle
+                color: '#FBC02D'
+                col: 1
+              - id: 1791445883546
+                type: waste_collection
+                category_id: bio
+                name: Bio otpad
+                icon: mdi:leaf
+                color: '#8D6E63'
+              - id: 1791445885584
+                type: waste_collection
+                category_id: papir
+                name: Papir
+                icon: mdi:package-variant
+                color: '#1E88E5'
+              - id: 1791445884443
+                type: waste_collection
+                category_id: metal_staklo
+                name: Metal, tetrapak, staklo
+                icon: mdi:glass-cocktail
+                color: '#90A4AE'
+              - id: 9442122754409
+                type: button
+                entity_id: todo.shopping_list
+                name: Namirnice
+            id: 9379529960472
+        id: 2901339199479
+      - type: horizontal-stack
+        sections:
+          - name: Spavaća
+            items:
+              - id: 9666125794248
+                type: button
+                entity_id: light.ivan_soba
+                name: Svijetlo
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "on") %}
+                      Uključeno
+                    {% else %}
+                      Isključeno
+                    {% endif %}
+                icon: mdi:lightbulb
+                show_circle: true
+                button_templates:
+                  - light
+                  - icon_hue
+                button_template: light
+                popup_action: none
+                more_info: false
+              - id: 3524697672612
+                type: button
+                entity_id: media_player.lg_c2
+                name: TV
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "on") %}
+                      Uključen
+                    {% else %}
+                      Isključen
+                    {% endif %}
+                shape: medium
+              - id: 3982077685804
+                type: button
+                entity_id: sensor.senzor_soba_temperature
+                template:
+                  name: |-
+                    {% if is_state(entity_id, "on") %}
+                      
+                    {% else %}
+                      
+                    {% endif %}
+                  state: >-
+                    {{ states('sensor.senzor_soba_temperature') }} °C, {{
+                    states('sensor.senzor_soba_humidity') }} %
+                  service: |-
+                    service: browser_mod.popup
+                    data:
+                      title: Graf sobne temperature
+                      content:
+                        type: custom:layout-card
+                        layout_type: custom:grid-layout
+                        cards:
+                          - type: custom:mini-graph-card      
+                            name: Temperatura
+                            entities:
+                              - sensor.senzor_soba_temperature                          
+                          - type: custom:mini-graph-card     
+                            name: Vlaga
+                            entities:
+                              - sensor.senzor_soba_humidity                           
+                            line_color: blue
+                name: Temperatura
+                more_info: false
+                col: 2
+              - id: 432757253985
+                type: custom_card
+                card_type: mushroom-light-card
+                card_file: mushroom.js
+                card_config:
+                  type: custom:mushroom-light-card
+                  entity: light.ivan_soba
+                  show_brightness_control: true
+                  show_color_temp_control: true
+                name: Mushroom Light Card
+                shape: square
+                col: 1
+              - id: 4513212930675
+                type: button
+                entity_id: switch.shelly1pmg4_a085e3baebf8
+                button_templates:
+                  - icon_fan2
+                button_template: icon_fan2
+                name: Ventilator
+                col: 1
+            id: 1012184419747
+          - name: Section
+            items: []
+            id: 4844383788490
+        id: 8283132005835
+    icon: mdi:house
+  - name: Dvorište
+    id: 1528177881140
+    sections:
+      - type: horizontal-stack
+        sections:
+          - name: Dvorište
+            items:
+              - id: 9156743203736
+                type: button
+                entity_id: >-
+                  sensor.slameks_residence_domestic_hot_water_0_current_special_function
+                name: Ograda
+                icon: mdi:gate
+                more_info: false
+                template:
+                  state: >-
+                    {% if is_state('binary_sensor.magnetni_garaza1_contact',
+                    "on") %}
+                      Otvorena
+                    {% else %}
+                      Zatvorena
+                    {% endif %}
+              - id: 6697762881629
+                type: button
+                entity_id: light.shellyrgbw2_bcff4d49f6a6_channel_4
+                name: Ulaz
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "on") %}
+                      Uključeno
+                    {% else %}
+                      Isključeno
+                    {% endif %}
+              - id: 5178991820080
+                type: button
+                entity_id: light.nadstresnica_rasvjeta_straznja
+                name: Nadstresnica
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "on") %}
+                      Uključeno
+                    {% else %}
+                      Isključeno
+                    {% endif %}
+            id: 7820758202799
+          - name: Garaža
+            items:
+              - id: 1992663299555
+                type: button
+                entity_id: cover.garaza_mercedes_mercedes_2
+                name: Garažna vrata
+              - id: 3975661066601
+                type: button
+                entity_id: switch.shellyplus1_a0a3b3dcbbcc_switch_0
+                name: Svijetlo
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "on") %}
+                      Uključeno
+                    {% else %}
+                      Isključeno
+                    {% endif %}
+                icon: mdi:lightbulb
+              - id: 5307483372333
+                type: button
+                entity_id: switch.garage_outdor_switch_0
+                name: Rasvjeta vanjska
+                icon: mdi:outdoor-lamp
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "on") %}
+                      Uključeno
+                    {% else %}
+                      Isključeno
+                    {% endif %}
+              - id: 3672452330432
+                type: button
+                entity_id: sensor.susilica_program
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "on") %}
+                      Pokret detektiran
+                    {% else %}
+                      Nema pokreta
+                    {% endif %}
+                name: Senzor pokreta
+            id: 7779580305411
+          - name: Ured
+            items:
+              - id: 2342740641153
+                type: button
+                entity_id: switch.shellyplus1_7c87ce726bd8_switch_0
+                tap_action:
+                  action: call-service
+                  service: browser_mod.popup
+                  data:
+                    title: SmartHomeScene.com
+                    content:
+                      type: horizontal-stack
+                      cards:
+                        type: button
+                        tap_action:
+                          action: call-service
+                          service: script.turn_on
+                          data:
+                            entity_id: script.ventilator_ivan_off
+                name: Ured
+                icon: mdi:bulb
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "on") %}
+                      Uključeno
+                    {% else %}
+                      Isključeno
+                    {% endif %}
+              - id: 1883812944703
+                type: button
+                entity_id: light.office_overhead
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "on") %}
+                      Uključeno
+                    {% else %}
+                      Isključeno
+                    {% endif %}
+                name: Ambijentalno
+              - id: 9074358864177
+                type: button
+                entity_id: media_player.lg_c2
+                template:
+                  state: |-
+                    {% if is_state(entity_id, "playing") %} Uključen
+                    {% elif is_state(entity_id , "on") %} Upaljen
+                    {% else %}
+                      Isključen
+                    {% endif %}
+                marquee: false
+              - id: 2380654618969
+                type: button
+                entity_id: sensor.senzor_ured_temperature
+                name: Temperatura
+                template:
+                  state: >-
+                    {{ states('sensor.senzor_ured_temperature') }} °C, {{
+                    states('sensor.senzor_ured_humidity') }} %
+                  service: |-
+                    service: browser_mod.popup
+                    data:
+                      title: Informacije
+                      content:
+                        type: custom:layout-card
+                        layout_type: custom:grid-layout
+                        cards:
+                          - type: custom:mini-graph-card
+                            name: Temperatura
+                            entities:
+                              - sensor.senzor_ured_temperature
+                          - type: custom:mini-graph-card
+                            name: Vlaga
+                            entities:
+                              - sensor.senzor_ured_humidity
+                            line_color: blue
+                icon: mdi:thermometer
+                more_info: false
+            id: 3809752614194
+        id: 6776152653506
+    icon: mdi:grass
+  - name: Kamere
+    id: 1532410067553
+    sections:
+      - type: horizontal-stack
+        sections:
+          - name: Dvorište
+            items:
+              - id: 1093628476756
+                type: camera
+                entity_id: camera.front_door_live_view
+                stream: true
+            id: 2251382459990
+          - name: Ulaz
+            items:
+              - id: 7572178261157
+                type: camera
+                entity_id: camera.front_door_live_view
+                stream: true
+            id: 3842123197594
+        id: 7002281436812
+    icon: mdi:cctv
+  - name: WiFi
+    id: 7341631977755
+    sections:
+      - name: Skeniraj me!
+        items:
+          - id: 2296044464871
+            type: picture_elements
+            elements:
+              - attrs:
+                  id: image-1732035612526-6nu9zk1pl
+                  type: image
+                  name: Image
+                  x: 117.5
+                  'y': 15
+                  width: 1125
+                  height: 1125
+                  scaleX: 0.2088888888888889
+                  scaleY: 0.2088888888888889
+                  rotation: 0
+                  opacity: 1
+                  draggable: true
+                  listening: true
+                  visible: true
+                  src: ' /local/images/wifi-qr-code.png'
+                className: Image
+        id: 8354354113407
+    icon: svg-spinners:wifi
+  - name: Media
+    id: 1861716458700
+    sections:
+      - type: horizontal-stack
+        sections:
+          - name: Media
+            items:
+              - id: 6260691477462
+                type: button
+                entity_id: media_player.ivans_2_fire
+              - id: 7484354619507
+                type: button
+                entity_id: media_player.lg_c2
+                name: Radna soba
+              - id: 6773382421677
+                type: button
+                entity_id: media_player.ivans_2_echo_show_8_2nd_gen
+                name: Soba
+              - id: 8740765292978
+                type: button
+                entity_id: media_player.ivan_s_2nd_fire_tv
+            id: 7012269653384
+          - name: Media
+            items:
+              - id: 7134375849233
+                type: media
+                conditional:
+                  - entity_id: media_player.lg_c2
+                  - entity_id: media_player.ivan_s_2nd_fire_tv
+                  - entity_id: media_player.ivan_s_firetvstick
+                  - entity_id: media_player.ivans_2_echo_show_8_2nd_gen
+                marquee: true
+                show_timeout: true
+            id: 3595630466199
+        id: 8069054080804
+    icon: material-symbols:perm-media-outline
+  - name: Network
+    id: 5979863322695
+    sections:
+      - name: Speedtest.net
+        items:
+          - id: 7355949752240
+            type: button
+            entity_id: sensor.speedtest_download
+            name: Download speed
+            icon: mdi:arrow-down-circle
+          - id: 6546085800914
+            type: button
+            entity_id: sensor.speedtest_upload
+            name: Upload speed
+            icon: mdi:arrow-up-circle
+          - id: 8436200163206
+            type: button
+            entity_id: sensor.speedtest_ping
+            name: Latency
+            icon: mdi:timelapse
+        id: 7727197395244
+      - name: Network rack
+        items:
+          - id: 6779614689848
+            type: button
+            entity_id: sensor.network_rack_power
+            name: Trenutna potrošnja
+          - id: 7226618595399
+            type: button
+            entity_id: sensor.network_rack_energy
+            name: Ukupna potrošnja
+            template:
+              state: '{{ states(entity_id) | round(2) }} kWh'
+        id: 3209696318455
+    icon: mdi:lan
+  - name: Grijanje
+    id: 6111301738413
+    sections:
+      - name: Informacije
+        items:
+          - id: 8597225437903
+            type: button
+            entity_id: sensor.slameks_residence_outdoor_temperature
+            name: Vanjska temperatura
+            more_info: false
+          - id: 1641089786839
+            type: button
+            entity_id: sensor.slameks_residence_zone_1_circuit_0_current_temperature
+            name: Unutarnja temperatura
+            more_info: false
+          - id: 5285608596769
+            type: button
+            entity_id: sensor.slameks_residence_system_water_pressure
+            name: Pritisak vode
+            more_info: false
+          - id: 3292882041174
+            type: button
+            entity_id: sensor.slameks_residence_circuit_0_current_flow_temperature
+            name: Temperatura polaznog voda
+            more_info: false
+          - id: 3954486408757
+            type: button
+            entity_id: sensor.slameks_residence_circuit_0_heating_curve
+            name: Heating curve
+            more_info: false
+        id: 5009150893703
+      - name: Section
+        items:
+          - id: 4252984740980
+            type: button
+            entity_id: climate.slameks_residence_zone_1_circuit_0_climate
+            name: Grijanje
+        id: 4652841589365
+    icon: mdi:hvac
+sidebar:
+  - id: 1018481013319
+    type: weather
+    entity_id: weather.home
+  - id: 5094940396842
+    type: template
+    template: |-
+      {% set time = {
+        "hours": now().strftime('%H'),
+        "minutes": now().strftime('%M')
+      } %}
+
+      <h1 style="font-size:54px;">{{ time.hours }}:{{ time.minutes }}</h1>
+  - id: 1681744880469
+    type: weather-forecast
+    entity: weather.home
+    forecast_type: daily
+  - id: 7784004720207
+    type: template
+    template: >-
+      {% if strptime(states('sensor.date'), '%Y-%m-%d').day != None %}
+        {% set days = ['Ponedjeljak', 'Utorak', 'Srijeda', 'Četvrtak', 'Petak', 'Subota', 'Nedjelja'] %}
+        {% set months = ['Siječanj', 'Veljača', 'Ožujak', 'Travanj', 'Svibanj', 'Lipanj', 'Srpanj', 'Kolovoz', 'Rujan', 'Listopad', 'Studeni', 'Prosinac'] %}
+       <h1 style="font-size:30px;color: #6a7377;"> {{days[now().weekday()] }}</h1> <b>
+      <h1 style="color: #6a7377;font-size:30px">{{
+      strptime(states('sensor.date'), '%Y-%m-%d').day }} 
+
+      {{ months[now().month-1] }}</h1>
+
+      {% endif %}
+  - id: 3753002678087
+    type: divider
+    mode: empty
+  - id: 7797413857130
+    type: navigate
+  - id: 2840069577383
+    type: divider
+    mode: empty
+    size: 50
+  - id: 3516839506504
+    type: template
+    template: |-
+      {% set lights = [
+                  states.light.ivan_soba,
+                  states.light.garaza1,
+                  states.light.garaza2,
+                  states.light.nadstresnica_rasvjeta_prednje,
+                  states.light.nadstresnica_rasvjeta_straznje
+                ] %}
+
+                {% set devices = [
+                  states.switch.sonoff_1001531f67, 
+                  states.switch.chuangmi_hmi206_0fc1_switch,
+                  states.climate.ivan_ac
+                ] %}
+
+                {% set covers = [
+                  states.cover.garaza_mercedes_mercedes,
+                  states.cover.skoda
+                ] %}
+
+                {% set lights_on = lights | selectattr('state','eq','on') | list %}
+                {% set lights_name = lights | selectattr('state','eq','on') | map(attribute='name') | join(', ') %}
+
+                {% set devices_on = devices | selectattr('state','search','(on|cool|fan_only|playing)') | list %}
+                {% set devices_name = devices_on | map(attribute='name') | join(', ') %}
+
+                {% set covers_opened = covers | selectattr('state','search','(open)') | list %}
+                {% set covers_name = covers_on | map(attribute='name') | join(', ') %}
+
+                {% if (lights_on | length == 0) and (devices_on | length == 1) %}
+                  {{ devices_name | regex_replace(',([^,]*)$',' i\\1') }} je uključen
+
+                {% elif (lights_on | length == 0) and (devices_on | length > 1) %}
+                  {{ devices_name | regex_replace(',([^,]*)$',' i\\1') }} su uključena
+
+                {% elif (lights_on | length == 1) and (devices_on | length == 1) %}
+                  {{ lights_name }} i {{devices_name }} su uključena
+
+                {% elif (lights_on | length == 1) and (devices_on | length > 1) %}
+                  {{ lights_name }}, {{ devices_name | regex_replace(',([^,]*)$',' i\\1') }} är på
+
+                {% elif (lights_on | length > 1) and (devices_on | length == 1) %}
+                  {{ lights_on | length }} svijetla i {{ devices_name }} su uključena
+
+                {% elif (lights_on | length > 1) and (devices_on | length > 1) %}
+                  {{ lights_on | length }} svijetla, {{ devices_name | regex_replace(',([^,]*)$',' och\\1') }} är på
+
+                {% elif (lights_on | length == 1) and (devices_on | length == 0) %}
+                  {{ lights_name }} je uključeno
+
+                {% elif (lights_on | length > 1) and (devices_on | length == 0) %}
+                  Uključena su {{ lights_on | length }} svijetla
+
+                {% else %}
+                  <font color='#6a7377'>Sve je isključeno</font>
+                {% endif %}
+  - id: 3937886245750
+    type: divider
+    mode: empty
+  - id: 5251009637167
+    type: graph
+    entity_id: sensor.potrosnja_struje_w
+theme: muted
+sidebarWidth: 210

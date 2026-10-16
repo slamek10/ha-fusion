@@ -1,0 +1,71 @@
+{
+	"/": [
+		"src/routes/+page.server.ts"
+	],
+	"/_api/button_templates": [
+		"src/routes/_api/button_templates/+server.ts"
+	],
+	"/_api/custom_cards": [
+		"src/routes/_api/custom_cards/+server.ts"
+	],
+	"/_api/custom_cards/file": [
+		"src/routes/_api/custom_cards/file/+server.ts"
+	],
+	"/_api/custom_cards/install": [
+		"src/routes/_api/custom_cards/install/+server.ts"
+	],
+	"/_api/custom_css": [
+		"src/routes/_api/custom_css/+server.ts"
+	],
+	"/_api/custom_js": [
+		"src/routes/_api/custom_js/+server.ts"
+	],
+	"/_api/get_all_themes": [
+		"src/routes/_api/get_all_themes/+server.ts"
+	],
+	"/_api/get_calendar": [
+		"src/routes/_api/get_calendar/+server.ts"
+	],
+	"/_api/get_docs": [
+		"src/routes/_api/get_docs/+server.ts"
+	],
+	"/_api/get_translation": [
+		"src/routes/_api/get_translation/+server.ts"
+	],
+	"/_api/list_languages": [
+		"src/routes/_api/list_languages/+server.ts"
+	],
+	"/_api/load_theme": [
+		"src/routes/_api/load_theme/+server.ts"
+	],
+	"/_api/log_backend": [
+		"src/routes/_api/log_backend/+server.ts"
+	],
+	"/_api/popups": [
+		"src/routes/_api/popups/+server.ts"
+	],
+	"/_api/save_config": [
+		"src/routes/_api/save_config/+server.ts"
+	],
+	"/_api/save_dashboard": [
+		"src/routes/_api/save_dashboard/+server.ts"
+	],
+	"/_api/version": [
+		"src/routes/_api/version/+server.ts"
+	],
+	"/_api/waste_collection": [
+		"src/routes/_api/waste_collection/+server.ts"
+	],
+	"/_api/waste_collection/ai_extract": [
+		"src/routes/_api/waste_collection/ai_extract/+server.ts"
+	],
+	"/_api/waste_collection/image": [
+		"src/routes/_api/waste_collection/image/+server.ts"
+	],
+	"/_api/waste_collection/upload": [
+		"src/routes/_api/waste_collection/upload/+server.ts"
+	],
+	"/_api/youtube": [
+		"src/routes/_api/youtube/+server.ts"
+	]
+}

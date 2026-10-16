@@ -1,0 +1,12 @@
+settings:
+  variables:
+    entity_tablet: switch.galaxy_tab_a_screensaver
+    entity_browser_mod: media_player.tablet
+    translate_unknown: Nepoznato
+    translate_idle: Inaktivan
+    translate_home: Kod kuće
+    translate_not_home: Nije kod kuće
+    translate_available: Dostupno
+    translate_no_updates: Nema ažuriranja
+    translate_update_available: Ažuriranje dostupno
+    translate_updates_available: Ažuriranja dostupna

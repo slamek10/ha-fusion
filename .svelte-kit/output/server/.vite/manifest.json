@@ -1,0 +1,799 @@
+{
+  ".svelte-kit/generated/server/internal.js": {
+    "file": "internal.js",
+    "name": "internal",
+    "src": ".svelte-kit/generated/server/internal.js",
+    "isEntry": true,
+    "imports": [
+      "_internal.js",
+      "_internal2.js"
+    ]
+  },
+  "_Icon.js": {
+    "file": "chunks/Icon.js",
+    "name": "Icon",
+    "imports": [
+      "_index-server.js",
+      "_server.js"
+    ]
+  },
+  "_Modals.js": {
+    "file": "chunks/Modals.js",
+    "name": "Modals",
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_index-server2.js",
+      "_events.js"
+    ]
+  },
+  "_StateLogic.js": {
+    "file": "chunks/StateLogic.js",
+    "name": "StateLogic",
+    "imports": [
+      "_server.js",
+      "_Stores.js"
+    ],
+    "dynamicImports": [
+      "src/lib/Components/Marquee.svelte"
+    ]
+  },
+  "_Stores.js": {
+    "file": "chunks/Stores.js",
+    "name": "Stores",
+    "imports": [
+      "_server.js",
+      "_index-server2.js"
+    ]
+  },
+  "_customCards.Di1UGJcM.css": {
+    "file": "_app/immutable/assets/customCards.Di1UGJcM.css",
+    "src": "_customCards.Di1UGJcM.css"
+  },
+  "_customCards.js": {
+    "file": "chunks/customCards.js",
+    "name": "customCards",
+    "imports": [
+      "_index-server.js",
+      "_internal.js",
+      "_server.js",
+      "_index-server2.js",
+      "_Stores.js",
+      "_paths.js"
+    ],
+    "css": [
+      "_app/immutable/assets/customCards.Di1UGJcM.css"
+    ]
+  },
+  "_env.js": {
+    "file": "chunks/env.js",
+    "name": "env"
+  },
+  "_events.js": {
+    "file": "chunks/events.js",
+    "name": "events",
+    "imports": [
+      "_server.js"
+    ]
+  },
+  "_exports.js": {
+    "file": "chunks/exports.js",
+    "name": "exports"
+  },
+  "_index-server.js": {
+    "file": "chunks/index-server.js",
+    "name": "index-server",
+    "imports": [
+      "_server.js"
+    ]
+  },
+  "_index-server2.js": {
+    "file": "chunks/index-server2.js",
+    "name": "index-server",
+    "imports": [
+      "_server.js"
+    ]
+  },
+  "_internal.js": {
+    "file": "chunks/internal.js",
+    "name": "internal"
+  },
+  "_internal2.js": {
+    "file": "chunks/internal2.js",
+    "name": "internal",
+    "imports": [
+      "_index-server.js",
+      "_internal.js",
+      "_server.js",
+      "_events.js"
+    ],
+    "dynamicImports": [
+      "src/hooks.server.ts"
+    ]
+  },
+  "_paths.js": {
+    "file": "chunks/paths.js",
+    "name": "paths",
+    "imports": [
+      "_internal.js",
+      "_internal2.js",
+      "_routing.js"
+    ]
+  },
+  "_routing.js": {
+    "file": "chunks/routing.js",
+    "name": "routing"
+  },
+  "_server.js": {
+    "file": "chunks/server.js",
+    "name": "server"
+  },
+  "_shared.js": {
+    "file": "chunks/shared.js",
+    "name": "shared"
+  },
+  "_sortable.js": {
+    "file": "chunks/sortable.js",
+    "name": "sortable"
+  },
+  "_utils.js": {
+    "file": "chunks/utils.js",
+    "name": "utils",
+    "imports": [
+      "_shared.js"
+    ]
+  },
+  "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-cyrillic-ext-wght-normal.woff2": {
+    "file": "_app/immutable/assets/inter-cyrillic-ext-wght-normal.BOeWTOD4.woff2",
+    "src": "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-cyrillic-ext-wght-normal.woff2"
+  },
+  "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-cyrillic-wght-normal.woff2": {
+    "file": "_app/immutable/assets/inter-cyrillic-wght-normal.DqGufNeO.woff2",
+    "src": "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-cyrillic-wght-normal.woff2"
+  },
+  "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-greek-ext-wght-normal.woff2": {
+    "file": "_app/immutable/assets/inter-greek-ext-wght-normal.DlzME5K_.woff2",
+    "src": "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-greek-ext-wght-normal.woff2"
+  },
+  "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-greek-wght-normal.woff2": {
+    "file": "_app/immutable/assets/inter-greek-wght-normal.CkhJZR-_.woff2",
+    "src": "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-greek-wght-normal.woff2"
+  },
+  "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2": {
+    "file": "_app/immutable/assets/inter-latin-ext-wght-normal.DO1Apj_S.woff2",
+    "src": "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2"
+  },
+  "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2": {
+    "file": "_app/immutable/assets/inter-latin-wght-normal.Dx4kXJAl.woff2",
+    "src": "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2"
+  },
+  "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-vietnamese-wght-normal.woff2": {
+    "file": "_app/immutable/assets/inter-vietnamese-wght-normal.CBcvBZtf.woff2",
+    "src": "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-vietnamese-wght-normal.woff2"
+  },
+  "node_modules/.pnpm/@sveltejs+kit@2.69.2_@sveltejs+vite-plugin-svelte@7.2.0_svelte@5.56.8_@typescript-eslin_668f941f5eaf1c1699e3e8090fefc846/node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js": {
+    "file": "remote-entry.js",
+    "name": "remote-entry",
+    "src": "node_modules/.pnpm/@sveltejs+kit@2.69.2_@sveltejs+vite-plugin-svelte@7.2.0_svelte@5.56.8_@typescript-eslin_668f941f5eaf1c1699e3e8090fefc846/node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js",
+    "isEntry": true,
+    "imports": [
+      "_shared.js",
+      "_internal.js",
+      "_utils.js"
+    ]
+  },
+  "node_modules/.pnpm/@sveltejs+kit@2.69.2_@sveltejs+vite-plugin-svelte@7.2.0_svelte@5.56.8_@typescript-eslin_668f941f5eaf1c1699e3e8090fefc846/node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte": {
+    "file": "entries/fallbacks/error.svelte.js",
+    "name": "entries/fallbacks/error.svelte",
+    "src": "node_modules/.pnpm/@sveltejs+kit@2.69.2_@sveltejs+vite-plugin-svelte@7.2.0_svelte@5.56.8_@typescript-eslin_668f941f5eaf1c1699e3e8090fefc846/node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_shared.js",
+      "_internal.js",
+      "_routing.js",
+      "_server.js",
+      "_index-server2.js",
+      "_exports.js",
+      "_paths.js"
+    ]
+  },
+  "node_modules/.pnpm/@sveltejs+kit@2.69.2_@sveltejs+vite-plugin-svelte@7.2.0_svelte@5.56.8_@typescript-eslin_668f941f5eaf1c1699e3e8090fefc846/node_modules/@sveltejs/kit/src/runtime/server/index.js": {
+    "file": "index.js",
+    "name": "index",
+    "src": "node_modules/.pnpm/@sveltejs+kit@2.69.2_@sveltejs+vite-plugin-svelte@7.2.0_svelte@5.56.8_@typescript-eslin_668f941f5eaf1c1699e3e8090fefc846/node_modules/@sveltejs/kit/src/runtime/server/index.js",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_shared.js",
+      "_internal.js",
+      "_utils.js",
+      "_internal2.js",
+      "_routing.js",
+      "_server.js",
+      "_index-server2.js",
+      "_exports.js",
+      "_env.js"
+    ]
+  },
+  "src/hooks.server.ts": {
+    "file": "entries/hooks.server.js",
+    "name": "entries/hooks.server",
+    "src": "src/hooks.server.ts",
+    "isEntry": true
+  },
+  "src/lib/Components/CustomCss.svelte": {
+    "file": "chunks/CustomCss.js",
+    "name": "CustomCss",
+    "src": "src/lib/Components/CustomCss.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_internal.js",
+      "_server.js",
+      "_paths.js"
+    ]
+  },
+  "src/lib/Components/CustomJs.svelte": {
+    "file": "chunks/CustomJs.js",
+    "name": "CustomJs",
+    "src": "src/lib/Components/CustomJs.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_internal.js",
+      "_server.js",
+      "_paths.js"
+    ]
+  },
+  "src/lib/Components/Marquee.svelte": {
+    "file": "chunks/Marquee.js",
+    "name": "Marquee",
+    "src": "src/lib/Components/Marquee.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_server.js"
+    ],
+    "css": [
+      "_app/immutable/assets/Marquee.BnCFYbMK.css"
+    ]
+  },
+  "src/lib/Components/ResizeHandle.svelte": {
+    "file": "chunks/ResizeHandle.js",
+    "name": "ResizeHandle",
+    "src": "src/lib/Components/ResizeHandle.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_server.js",
+      "_Stores.js",
+      "_Icon.js"
+    ],
+    "css": [
+      "_app/immutable/assets/ResizeHandle.CCvaTrsa.css"
+    ]
+  },
+  "src/lib/Components/TokenModal.svelte": {
+    "file": "chunks/TokenModal.js",
+    "name": "TokenModal",
+    "src": "src/lib/Components/TokenModal.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js",
+      "_Modals.js",
+      "_paths.js",
+      "_Icon.js"
+    ],
+    "css": [
+      "_app/immutable/assets/TokenModal.DerNSsC6.css"
+    ]
+  },
+  "src/lib/Drawer/AddDropdown.svelte": {
+    "file": "chunks/AddDropdown.js",
+    "name": "AddDropdown",
+    "src": "src/lib/Drawer/AddDropdown.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js",
+      "_Icon.js"
+    ],
+    "css": [
+      "_app/immutable/assets/AddDropdown.CyPaQjW3.css"
+    ]
+  },
+  "src/lib/Drawer/AppearanceButton.svelte": {
+    "file": "chunks/AppearanceButton.js",
+    "name": "AppearanceButton",
+    "src": "src/lib/Drawer/AppearanceButton.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_server.js",
+      "_Stores.js",
+      "_Modals.js",
+      "_paths.js",
+      "_Icon.js"
+    ]
+  },
+  "src/lib/Drawer/CodeButton.svelte": {
+    "file": "chunks/CodeButton.js",
+    "name": "CodeButton",
+    "src": "src/lib/Drawer/CodeButton.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_server.js",
+      "_Stores.js",
+      "_Modals.js",
+      "_Icon.js"
+    ],
+    "css": [
+      "_app/immutable/assets/CodeButton.BcTbMBRR.css"
+    ]
+  },
+  "src/lib/Drawer/EditModeButton.svelte": {
+    "file": "chunks/EditModeButton.js",
+    "name": "EditModeButton",
+    "src": "src/lib/Drawer/EditModeButton.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js",
+      "_Modals.js",
+      "_Icon.js"
+    ]
+  },
+  "src/lib/Drawer/HistoryButtons.svelte": {
+    "file": "chunks/HistoryButtons.js",
+    "name": "HistoryButtons",
+    "src": "src/lib/Drawer/HistoryButtons.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js",
+      "_Modals.js",
+      "_Icon.js"
+    ],
+    "css": [
+      "_app/immutable/assets/HistoryButtons.DPn5Xojs.css"
+    ]
+  },
+  "src/lib/Drawer/Index.svelte": {
+    "file": "chunks/Index.js",
+    "name": "Index",
+    "src": "src/lib/Drawer/Index.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js",
+      "_Icon.js"
+    ],
+    "dynamicImports": [
+      "src/lib/Drawer/EditModeButton.svelte",
+      "src/lib/Drawer/AddDropdown.svelte",
+      "src/lib/Drawer/AppearanceButton.svelte",
+      "src/lib/Drawer/HistoryButtons.svelte",
+      "src/lib/Drawer/SaveButton.svelte",
+      "src/lib/Drawer/CodeButton.svelte",
+      "src/lib/Drawer/SearchInput.svelte",
+      "src/lib/Drawer/SettingsButton.svelte"
+    ],
+    "css": [
+      "_app/immutable/assets/Index.DVn8smsZ.css"
+    ]
+  },
+  "src/lib/Drawer/MenuButton.svelte": {
+    "file": "chunks/MenuButton.js",
+    "name": "MenuButton",
+    "src": "src/lib/Drawer/MenuButton.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js"
+    ],
+    "css": [
+      "_app/immutable/assets/MenuButton.Cg2RdvQ2.css"
+    ]
+  },
+  "src/lib/Drawer/SaveButton.svelte": {
+    "file": "chunks/SaveButton.js",
+    "name": "SaveButton",
+    "src": "src/lib/Drawer/SaveButton.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_server.js",
+      "_Stores.js",
+      "_Modals.js",
+      "_paths.js",
+      "_Icon.js"
+    ]
+  },
+  "src/lib/Drawer/SearchInput.svelte": {
+    "file": "chunks/SearchInput.js",
+    "name": "SearchInput",
+    "src": "src/lib/Drawer/SearchInput.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js",
+      "_Modals.js",
+      "_Icon.js"
+    ],
+    "css": [
+      "_app/immutable/assets/SearchInput.YVUsBGwA.css"
+    ]
+  },
+  "src/lib/Drawer/SettingsButton.svelte": {
+    "file": "chunks/SettingsButton.js",
+    "name": "SettingsButton",
+    "src": "src/lib/Drawer/SettingsButton.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_server.js",
+      "_Stores.js",
+      "_Modals.js",
+      "_paths.js",
+      "_Icon.js"
+    ]
+  },
+  "src/lib/Main/Camera/HLS.svelte": {
+    "file": "chunks/HLS.js",
+    "name": "HLS",
+    "src": "src/lib/Main/Camera/HLS.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js"
+    ],
+    "css": [
+      "_app/immutable/assets/HLS.D0LtL4TT.css"
+    ]
+  },
+  "src/lib/Main/Camera/Info.svelte": {
+    "file": "chunks/Info.js",
+    "name": "Info",
+    "src": "src/lib/Main/Camera/Info.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_server.js",
+      "_Stores.js",
+      "_Icon.js",
+      "_StateLogic.js"
+    ],
+    "css": [
+      "_app/immutable/assets/Info.C2tQxKu0.css"
+    ]
+  },
+  "src/lib/Main/Camera/Proxy.svelte": {
+    "file": "chunks/Proxy.js",
+    "name": "Proxy",
+    "src": "src/lib/Main/Camera/Proxy.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js",
+      "_Icon.js"
+    ],
+    "css": [
+      "_app/immutable/assets/Proxy.B4Aly5Fn.css"
+    ]
+  },
+  "src/lib/Main/Camera/WebRTC.svelte": {
+    "file": "chunks/WebRTC.js",
+    "name": "WebRTC",
+    "src": "src/lib/Main/Camera/WebRTC.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js"
+    ],
+    "css": [
+      "_app/immutable/assets/WebRTC.BXaJ2qrW.css"
+    ]
+  },
+  "src/lib/Main/Index.svelte": {
+    "file": "chunks/Index2.js",
+    "name": "Index",
+    "src": "src/lib/Main/Index.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_internal.js",
+      "_internal2.js",
+      "_server.js",
+      "_index-server2.js",
+      "_events.js",
+      "_Stores.js",
+      "_Modals.js",
+      "_customCards.js",
+      "_paths.js",
+      "_Icon.js",
+      "_StateLogic.js",
+      "_sortable.js"
+    ],
+    "dynamicImports": [
+      "src/lib/Main/Camera/HLS.svelte",
+      "src/lib/Main/Camera/WebRTC.svelte",
+      "src/lib/Main/Camera/Proxy.svelte",
+      "src/lib/Main/Camera/Info.svelte"
+    ],
+    "css": [
+      "_app/immutable/assets/Index.CKbeZgm9.css"
+    ]
+  },
+  "src/lib/Main/Intro.svelte": {
+    "file": "chunks/Intro.js",
+    "name": "Intro",
+    "src": "src/lib/Main/Intro.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js",
+      "_paths.js"
+    ],
+    "css": [
+      "_app/immutable/assets/Intro.Dquetp6P.css"
+    ]
+  },
+  "src/lib/Main/Views.svelte": {
+    "file": "chunks/Views.js",
+    "name": "Views",
+    "src": "src/lib/Main/Views.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js",
+      "_Modals.js",
+      "_Icon.js",
+      "_sortable.js"
+    ],
+    "css": [
+      "_app/immutable/assets/Views.CViw2atk.css"
+    ]
+  },
+  "src/lib/Sidebar/Index.svelte": {
+    "file": "chunks/Index3.js",
+    "name": "Index",
+    "src": "src/lib/Sidebar/Index.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js",
+      "_Modals.js",
+      "_sortable.js"
+    ],
+    "dynamicImports": [
+      "src/lib/Components/ResizeHandle.svelte",
+      "src/lib/Sidebar/Toast.svelte"
+    ],
+    "css": [
+      "_app/immutable/assets/Index.C40TGhtE.css"
+    ]
+  },
+  "src/lib/Sidebar/Toast.svelte": {
+    "file": "chunks/Toast.js",
+    "name": "Toast",
+    "src": "src/lib/Sidebar/Toast.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js"
+    ],
+    "css": [
+      "_app/immutable/assets/Toast.BUYex5yK.css"
+    ]
+  },
+  "src/routes/+layout.svelte": {
+    "file": "entries/pages/_layout.svelte.js",
+    "name": "entries/pages/_layout.svelte",
+    "src": "src/routes/+layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Stores.js",
+      "_Modals.js",
+      "_customCards.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_layout.BHiV4k-6.css"
+    ],
+    "assets": [
+      "_app/immutable/assets/inter-cyrillic-ext-wght-normal.BOeWTOD4.woff2",
+      "_app/immutable/assets/inter-cyrillic-wght-normal.DqGufNeO.woff2",
+      "_app/immutable/assets/inter-greek-ext-wght-normal.DlzME5K_.woff2",
+      "_app/immutable/assets/inter-greek-wght-normal.CkhJZR-_.woff2",
+      "_app/immutable/assets/inter-vietnamese-wght-normal.CBcvBZtf.woff2",
+      "_app/immutable/assets/inter-latin-ext-wght-normal.DO1Apj_S.woff2",
+      "_app/immutable/assets/inter-latin-wght-normal.Dx4kXJAl.woff2"
+    ]
+  },
+  "src/routes/+page.server.ts": {
+    "file": "entries/pages/_page.server.ts.js",
+    "name": "entries/pages/_page.server.ts",
+    "src": "src/routes/+page.server.ts",
+    "isEntry": true
+  },
+  "src/routes/+page.svelte": {
+    "file": "entries/pages/_page.svelte.js",
+    "name": "entries/pages/_page.svelte",
+    "src": "src/routes/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_internal.js",
+      "_server.js",
+      "_Stores.js",
+      "_Modals.js",
+      "_paths.js"
+    ],
+    "dynamicImports": [
+      "src/lib/Components/TokenModal.svelte",
+      "src/lib/Main/Views.svelte",
+      "src/lib/Main/Index.svelte",
+      "src/lib/Main/Intro.svelte",
+      "src/lib/Sidebar/Index.svelte",
+      "src/lib/Drawer/MenuButton.svelte",
+      "src/lib/Drawer/Index.svelte",
+      "src/lib/Components/CustomJs.svelte",
+      "src/lib/Components/CustomCss.svelte"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.S_lbxmNq.css"
+    ]
+  },
+  "src/routes/_api/button_templates/+server.ts": {
+    "file": "entries/endpoints/_api/button_templates/_server.ts.js",
+    "name": "entries/endpoints/_api/button_templates/_server.ts",
+    "src": "src/routes/_api/button_templates/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/custom_cards/+server.ts": {
+    "file": "entries/endpoints/_api/custom_cards/_server.ts.js",
+    "name": "entries/endpoints/_api/custom_cards/_server.ts",
+    "src": "src/routes/_api/custom_cards/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/custom_cards/file/+server.ts": {
+    "file": "entries/endpoints/_api/custom_cards/file/_server.ts.js",
+    "name": "entries/endpoints/_api/custom_cards/file/_server.ts",
+    "src": "src/routes/_api/custom_cards/file/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/custom_cards/install/+server.ts": {
+    "file": "entries/endpoints/_api/custom_cards/install/_server.ts.js",
+    "name": "entries/endpoints/_api/custom_cards/install/_server.ts",
+    "src": "src/routes/_api/custom_cards/install/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/custom_css/+server.ts": {
+    "file": "entries/endpoints/_api/custom_css/_server.ts.js",
+    "name": "entries/endpoints/_api/custom_css/_server.ts",
+    "src": "src/routes/_api/custom_css/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/custom_js/+server.ts": {
+    "file": "entries/endpoints/_api/custom_js/_server.ts.js",
+    "name": "entries/endpoints/_api/custom_js/_server.ts",
+    "src": "src/routes/_api/custom_js/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/get_all_themes/+server.ts": {
+    "file": "entries/endpoints/_api/get_all_themes/_server.ts.js",
+    "name": "entries/endpoints/_api/get_all_themes/_server.ts",
+    "src": "src/routes/_api/get_all_themes/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/get_calendar/+server.ts": {
+    "file": "entries/endpoints/_api/get_calendar/_server.ts.js",
+    "name": "entries/endpoints/_api/get_calendar/_server.ts",
+    "src": "src/routes/_api/get_calendar/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/get_docs/+server.ts": {
+    "file": "entries/endpoints/_api/get_docs/_server.ts.js",
+    "name": "entries/endpoints/_api/get_docs/_server.ts",
+    "src": "src/routes/_api/get_docs/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/get_translation/+server.ts": {
+    "file": "entries/endpoints/_api/get_translation/_server.ts.js",
+    "name": "entries/endpoints/_api/get_translation/_server.ts",
+    "src": "src/routes/_api/get_translation/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/list_languages/+server.ts": {
+    "file": "entries/endpoints/_api/list_languages/_server.ts.js",
+    "name": "entries/endpoints/_api/list_languages/_server.ts",
+    "src": "src/routes/_api/list_languages/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/load_theme/+server.ts": {
+    "file": "entries/endpoints/_api/load_theme/_server.ts.js",
+    "name": "entries/endpoints/_api/load_theme/_server.ts",
+    "src": "src/routes/_api/load_theme/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/log_backend/+server.ts": {
+    "file": "entries/endpoints/_api/log_backend/_server.ts.js",
+    "name": "entries/endpoints/_api/log_backend/_server.ts",
+    "src": "src/routes/_api/log_backend/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/popups/+server.ts": {
+    "file": "entries/endpoints/_api/popups/_server.ts.js",
+    "name": "entries/endpoints/_api/popups/_server.ts",
+    "src": "src/routes/_api/popups/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/save_config/+server.ts": {
+    "file": "entries/endpoints/_api/save_config/_server.ts.js",
+    "name": "entries/endpoints/_api/save_config/_server.ts",
+    "src": "src/routes/_api/save_config/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/save_dashboard/+server.ts": {
+    "file": "entries/endpoints/_api/save_dashboard/_server.ts.js",
+    "name": "entries/endpoints/_api/save_dashboard/_server.ts",
+    "src": "src/routes/_api/save_dashboard/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/version/+server.ts": {
+    "file": "entries/endpoints/_api/version/_server.ts.js",
+    "name": "entries/endpoints/_api/version/_server.ts",
+    "src": "src/routes/_api/version/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/waste_collection/+server.ts": {
+    "file": "entries/endpoints/_api/waste_collection/_server.ts.js",
+    "name": "entries/endpoints/_api/waste_collection/_server.ts",
+    "src": "src/routes/_api/waste_collection/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/waste_collection/ai_extract/+server.ts": {
+    "file": "entries/endpoints/_api/waste_collection/ai_extract/_server.ts.js",
+    "name": "entries/endpoints/_api/waste_collection/ai_extract/_server.ts",
+    "src": "src/routes/_api/waste_collection/ai_extract/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/waste_collection/image/+server.ts": {
+    "file": "entries/endpoints/_api/waste_collection/image/_server.ts.js",
+    "name": "entries/endpoints/_api/waste_collection/image/_server.ts",
+    "src": "src/routes/_api/waste_collection/image/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/waste_collection/upload/+server.ts": {
+    "file": "entries/endpoints/_api/waste_collection/upload/_server.ts.js",
+    "name": "entries/endpoints/_api/waste_collection/upload/_server.ts",
+    "src": "src/routes/_api/waste_collection/upload/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/youtube/+server.ts": {
+    "file": "entries/endpoints/_api/youtube/_server.ts.js",
+    "name": "entries/endpoints/_api/youtube/_server.ts",
+    "src": "src/routes/_api/youtube/+server.ts",
+    "isEntry": true
+  },
+  "virtual:__sveltekit/env": {
+    "file": "env.js",
+    "name": "env",
+    "src": "virtual:__sveltekit/env",
+    "isEntry": true,
+    "imports": [
+      "_env.js"
+    ]
+  }
+}

@@ -1,0 +1,302 @@
+[
+  {
+    "id": "washing-machine-card",
+    "name": "Washing Machine Animated Card",
+    "tag": "washing-machine-card",
+    "file": "washing-machine-card.js",
+    "url": "https://github.com/sionetta/wm_animated_ha_card",
+    "version": "1.4.0",
+    "author": "sionetta",
+    "description": "Animated appliance card for washer, dryer, dishwasher, oven and microwave with live status, power gauge and stats.",
+    "installed_at": "2026-10-08T11:25:00.000Z",
+    "default_config": {
+      "type": "custom:washing-machine-card",
+      "appliance_type": "washer",
+      "status_entity": "binary_sensor.washing_in_progress",
+      "power_entity": "",
+      "energy_entity": "",
+      "theme": "auto"
+    }
+  },
+  {
+    "id": "mushroom",
+    "name": "Mushroom Cards (Lovelace Mushroom)",
+    "tag": "mushroom-light-card",
+    "file": "mushroom.js",
+    "url": "https://github.com/piitaya/lovelace-mushroom",
+    "author": "piitaya",
+    "description": "Zbirka od 17 modernih Lovelace kartica (Light, Entity, Chips, Template, Cover, Fan, itd.).",
+    "installed_at": "2026-10-09T18:12:06.199Z",
+    "default_config": {
+      "type": "custom:mushroom-light-card",
+      "entity": "light.living_room",
+      "show_brightness_control": true,
+      "show_color_temp_control": true
+    },
+    "sub_cards": [
+      {
+        "tag": "mushroom-light-card",
+        "name": "Mushroom Light Card",
+        "default_config": {
+          "type": "custom:mushroom-light-card",
+          "entity": "light.living_room",
+          "show_brightness_control": true,
+          "show_color_temp_control": true
+        }
+      },
+      {
+        "tag": "mushroom-entity-card",
+        "name": "Mushroom Entity Card",
+        "default_config": {
+          "type": "custom:mushroom-entity-card",
+          "entity": "sensor.sun_next_rising"
+        }
+      },
+      {
+        "tag": "mushroom-template-card",
+        "name": "Mushroom Template Card",
+        "default_config": {
+          "type": "custom:mushroom-template-card",
+          "primary": "Dobar dan",
+          "secondary": "Sve radi ispravno",
+          "icon": "mdi:home"
+        }
+      },
+      {
+        "tag": "mushroom-chips-card",
+        "name": "Mushroom Chips Card",
+        "default_config": {
+          "type": "custom:mushroom-chips-card",
+          "chips": [
+            {
+              "type": "weather",
+              "entity": "weather.forecast_home"
+            }
+          ]
+        }
+      },
+      {
+        "tag": "mushroom-cover-card",
+        "name": "Mushroom Cover Card",
+        "default_config": {
+          "type": "custom:mushroom-cover-card",
+          "entity": "cover.living_room",
+          "show_position_control": true
+        }
+      },
+      {
+        "tag": "mushroom-fan-card",
+        "name": "Mushroom Fan Card",
+        "default_config": {
+          "type": "custom:mushroom-fan-card",
+          "entity": "fan.living_room",
+          "show_percentage_control": true,
+          "show_oscillate_control": true
+        }
+      },
+      {
+        "tag": "mushroom-climate-card",
+        "name": "Mushroom Climate Card",
+        "default_config": {
+          "type": "custom:mushroom-climate-card",
+          "entity": "climate.thermostat",
+          "show_temperature_control": true
+        }
+      },
+      {
+        "tag": "mushroom-person-card",
+        "name": "Mushroom Person Card",
+        "default_config": {
+          "type": "custom:mushroom-person-card",
+          "entity": "person.admin"
+        }
+      },
+      {
+        "tag": "mushroom-alarm-control-panel-card",
+        "name": "Mushroom Alarm Card",
+        "default_config": {
+          "type": "custom:mushroom-alarm-control-panel-card",
+          "entity": "alarm_control_panel.home"
+        }
+      },
+      {
+        "tag": "mushroom-lock-card",
+        "name": "Mushroom Lock Card",
+        "default_config": {
+          "type": "custom:mushroom-lock-card",
+          "entity": "lock.front_door"
+        }
+      },
+      {
+        "tag": "mushroom-media-player-card",
+        "name": "Mushroom Media Player Card",
+        "default_config": {
+          "type": "custom:mushroom-media-player-card",
+          "entity": "media_player.spotify",
+          "show_volume_level": true
+        }
+      },
+      {
+        "tag": "mushroom-vacuum-card",
+        "name": "Mushroom Vacuum Card",
+        "default_config": {
+          "type": "custom:mushroom-vacuum-card",
+          "entity": "vacuum.roborock"
+        }
+      },
+      {
+        "tag": "mushroom-title-card",
+        "name": "Mushroom Title Card",
+        "default_config": {
+          "type": "custom:mushroom-title-card",
+          "title": "Dnevni boravak",
+          "subtitle": "Pregled uređaja"
+        }
+      },
+      {
+        "tag": "mushroom-update-card",
+        "name": "Mushroom Update Card",
+        "default_config": {
+          "type": "custom:mushroom-update-card",
+          "entity": "update.ha_fusion"
+        }
+      },
+      {
+        "tag": "mushroom-number-card",
+        "name": "Mushroom Number Card",
+        "default_config": {
+          "type": "custom:mushroom-number-card",
+          "entity": "number.volume"
+        }
+      },
+      {
+        "tag": "mushroom-select-card",
+        "name": "Mushroom Select Card",
+        "default_config": {
+          "type": "custom:mushroom-select-card",
+          "entity": "select.mode"
+        }
+      },
+      {
+        "tag": "mushroom-humidifier-card",
+        "name": "Mushroom Humidifier Card",
+        "default_config": {
+          "type": "custom:mushroom-humidifier-card",
+          "entity": "humidifier.room"
+        }
+      }
+    ]
+  },
+  {
+    "id": "bubble-card",
+    "name": "Bubble Card",
+    "tag": "bubble-card",
+    "file": "bubble-card.js",
+    "url": "https://github.com/Clooos/Bubble-Card",
+    "author": "Clooos",
+    "description": "Modularna kolekcija modernih kartica (Button, Cover, Climate, Pop-up, Media Player itd.) za Home Assistant.",
+    "installed_at": "2026-10-13T18:53:47.340Z",
+    "default_config": {
+      "type": "custom:bubble-card",
+      "card_type": "button",
+      "entity": "light.living_room"
+    },
+    "sub_cards": [
+      {
+        "id": "bubble-button",
+        "tag": "bubble-card",
+        "name": "Bubble Button Card",
+        "default_config": {
+          "type": "custom:bubble-card",
+          "card_type": "button",
+          "entity": "light.living_room"
+        }
+      },
+      {
+        "id": "bubble-cover",
+        "tag": "bubble-card",
+        "name": "Bubble Cover Card",
+        "default_config": {
+          "type": "custom:bubble-card",
+          "card_type": "cover",
+          "entity": "cover.living_room"
+        }
+      },
+      {
+        "id": "bubble-climate",
+        "tag": "bubble-card",
+        "name": "Bubble Climate Card",
+        "default_config": {
+          "type": "custom:bubble-card",
+          "card_type": "climate",
+          "entity": "climate.thermostat"
+        }
+      },
+      {
+        "id": "bubble-media-player",
+        "tag": "bubble-card",
+        "name": "Bubble Media Player Card",
+        "default_config": {
+          "type": "custom:bubble-card",
+          "card_type": "media-player",
+          "entity": "media_player.spotify"
+        }
+      },
+      {
+        "id": "bubble-pop-up",
+        "tag": "bubble-card",
+        "name": "Bubble Pop-up Card",
+        "default_config": {
+          "type": "custom:bubble-card",
+          "card_type": "pop-up",
+          "hash": "#popup"
+        }
+      },
+      {
+        "id": "bubble-separator",
+        "tag": "bubble-card",
+        "name": "Bubble Separator Card",
+        "default_config": {
+          "type": "custom:bubble-card",
+          "card_type": "separator",
+          "name": "Naslov",
+          "icon": "mdi:home"
+        }
+      },
+      {
+        "id": "bubble-select",
+        "tag": "bubble-card",
+        "name": "Bubble Select Card",
+        "default_config": {
+          "type": "custom:bubble-card",
+          "card_type": "select",
+          "entity": "input_select.mode"
+        }
+      },
+      {
+        "id": "bubble-calendar",
+        "tag": "bubble-card",
+        "name": "Bubble Calendar Card",
+        "default_config": {
+          "type": "custom:bubble-card",
+          "card_type": "calendar",
+          "entity": "calendar.personal"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mini-climate",
+    "name": "Mini Climate Card",
+    "tag": "mini-climate",
+    "file": "mini-climate-card-bundle.js",
+    "url": "https://github.com/artem-sedykh/mini-climate-card",
+    "author": "artem-sedykh",
+    "description": "Prilagođena kartica za kontrolu klime i termostata.",
+    "installed_at": "2026-10-13T19:09:49.491Z",
+    "default_config": {
+      "type": "custom:mini-climate",
+      "entity": "climate.thermostat"
+    }
+  }
+]

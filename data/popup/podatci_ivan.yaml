@@ -1,0 +1,10 @@
+action: fire-dom-event
+browser_mod:
+  service: browser_mod.popup
+  data:
+    title: Podatci Ivan
+    content:
+      type: entities
+      entities:
+        - entity: person.ivan
+        - entity: sensor.ivan_phone_battery
