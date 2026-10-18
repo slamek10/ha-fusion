@@ -4,6 +4,8 @@ A fast, highly customizable, modern dashboard for [Home Assistant](https://www.h
 
 Connects to Home Assistant over WebSocket for instant real-time updates and optimistic state toggling, featuring an intuitive drag-and-drop editor, custom card support, Mattias Persson `button-card` template engine, bills management with AI OCR, and waste collection tracking.
 
+ha-fusion was created by [matt8707](https://github.com/matt8707). This repository is a maintained continuation and feature-rich fork of the [original project](https://github.com/matt8707/ha-fusion); see [Credits](#credits).
+
 [![Docker Image](https://img.shields.io/badge/docker-islamek%2Fha--fusion-blue.svg?logo=docker)](https://hub.docker.com/r/islamek/ha-fusion)
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Compatible-41BDF5.svg?logo=homeassistant)](https://www.home-assistant.io/)
 [![Svelte 5](https://img.shields.io/badge/Svelte-5-FF3E00.svg?logo=svelte)](https://svelte.dev/)
@@ -135,6 +137,15 @@ docker run -d \
 
 ---
 
+### 🔄 Migrating from the Original Project
+
+Dashboards are 100% compatible: your existing `dashboard.yaml`, `configuration.yaml`, button templates, and custom CSS carry over without modifications.
+
+To migrate an existing installation:
+- **Docker**: Update your image to `islamek/ha-fusion:latest` and keep your existing `/app/data` volume mount. All your cards and settings will load immediately.
+
+---
+
 ## 📂 Directory Structure (`/app/data`)
 
 When mounted, `./data` persists all your custom settings and assets:
@@ -227,5 +238,6 @@ pnpm build
 
 ## 📜 Credits
 
-- Original ha-fusion creator: [matt8707](https://github.com/matt8707) ([Original Repository](https://github.com/matt8707/ha-fusion)).
-- Maintained and extended by [slamek10](https://github.com/slamek10/ha-fusion) with custom card support, button template compatibility, multi-size cards, bills management, and AI scheduling.
+ha-fusion was created by [matt8707](https://github.com/matt8707), who wrote the initial implementation and core architecture and maintains the original repository at [matt8707/ha-fusion](https://github.com/matt8707/ha-fusion). If the project is useful to you, consider supporting him: <https://www.paypal.com/paypalme/matt8707>.
+
+This fork ([slamek10/ha-fusion](https://github.com/slamek10/ha-fusion)) actively maintains and extends ha-fusion with Lovelace custom cards support, Mattias Persson `button-card` templates compatibility, 3-tier button sizing (1/3, 2/3, 3/3), household bills management with AI OCR, waste collection calendar extraction, and continuous bug fixes.
