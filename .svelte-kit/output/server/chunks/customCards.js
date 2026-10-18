@@ -18,9 +18,23 @@ function Loader($$renderer, $$props) {
 var customCardsStore = writable([]);
 var customCardsLoaded = writable(false);
 var loadedScripts = /* @__PURE__ */ new Set();
+var loadingPromises = /* @__PURE__ */ new Map();
 var polyfillsInitialized = false;
 function initHaPolyfills() {
-	if (typeof window === "undefined" || typeof customElements === "undefined" || polyfillsInitialized) return;
+	if (typeof window === "undefined" || typeof customElements === "undefined") return;
+	if (!customElements._haPatched) {
+		const origDefine = customElements.define.bind(customElements);
+		customElements.define = function(name, constructor, options) {
+			if (customElements.get(name)) return;
+			try {
+				return origDefine(name, constructor, options);
+			} catch (e) {
+				console.warn(`[HA-Fusion] Could not define custom element "${name}":`, e);
+			}
+		};
+		customElements._haPatched = true;
+	}
+	if (polyfillsInitialized) return;
 	polyfillsInitialized = true;
 	if (!window.customCards) window.customCards = [];
 	if (!window.loadCardHelpers) window.loadCardHelpers = async () => ({
@@ -376,11 +390,7 @@ function initHaPolyfills() {
 		"ha-bar",
 		"ha-combo-box",
 		"hui-conditional-base",
-		"ha-form",
-		"ha-form-bc_cluster",
-		"ha-form-bc_group",
-		"ha-selector-bc_object",
-		"ha-selector-calendar_entity"
+		"ha-form"
 	]) if (!customElements.get(tag)) try {
 		customElements.define(tag, class extends DummyElement {});
 	} catch {}
@@ -400,42 +410,69 @@ async function fetchCustomCards(force = false) {
 	}
 	return get(customCardsStore);
 }
+function checkAndAliasTag(tagName) {
+	if (customElements.get(tagName)) return true;
+	const candidates = [
+		tagName.replace(/-card-bundle$/, ""),
+		tagName.replace(/-bundle$/, ""),
+		tagName.replace(/-card$/, ""),
+		`${tagName}-card`
+	];
+	for (const cand of candidates) {
+		const existingClass = customElements.get(cand);
+		if (cand !== tagName && existingClass) try {
+			customElements.define(tagName, class extends existingClass {});
+			return true;
+		} catch {}
+	}
+	const cc = window.customCards;
+	if (Array.isArray(cc)) for (const item of cc) {
+		const cand = item.type?.replace(/^custom:/, "");
+		const existingClass = cand ? customElements.get(cand) : void 0;
+		if (cand && existingClass) {
+			if (cand === tagName || tagName.includes(cand) || cand.includes(tagName) || tagName.replace(/[-_]/g, "") === cand.replace(/[-_]/g, "")) try {
+				customElements.define(tagName, class extends existingClass {});
+				return true;
+			} catch {}
+		}
+	}
+	return false;
+}
 /**
 * Ensures the Web Component script for the given card file and tagName is loaded in the browser.
 */
 async function ensureCardLoaded(cardFile, tagName) {
 	if (typeof window === "undefined" || typeof customElements === "undefined") return false;
 	initHaPolyfills();
-	if (customElements.get(tagName)) return true;
-	const scriptSrc = `${base}/_api/custom_cards/file?name=${encodeURIComponent(cardFile)}`;
-	if (loadedScripts.has(cardFile)) try {
-		await Promise.race([customElements.whenDefined(tagName), new Promise((r) => setTimeout(r, 2e3))]);
-		return Boolean(customElements.get(tagName));
-	} catch {
-		return Boolean(customElements.get(tagName));
+	if (checkAndAliasTag(tagName)) return true;
+	if (!loadingPromises.has(cardFile)) {
+		const scriptSrc = `${base}/_api/custom_cards/file?name=${encodeURIComponent(cardFile)}`;
+		loadingPromises.set(cardFile, new Promise((resolve) => {
+			const script = document.createElement("script");
+			script.type = "module";
+			script.src = scriptSrc;
+			const timeout = setTimeout(() => {
+				resolve(checkAndAliasTag(tagName));
+			}, 8e3);
+			script.onload = async () => {
+				clearTimeout(timeout);
+				loadedScripts.add(cardFile);
+				try {
+					await Promise.race([customElements.whenDefined(tagName), new Promise((r) => setTimeout(r, 1e3))]);
+				} catch {}
+				resolve(checkAndAliasTag(tagName));
+			};
+			script.onerror = () => {
+				clearTimeout(timeout);
+				loadingPromises.delete(cardFile);
+				console.error(`Failed to load custom card script: ${scriptSrc}`);
+				resolve(false);
+			};
+			document.head.appendChild(script);
+		}));
 	}
-	return new Promise((resolve) => {
-		const script = document.createElement("script");
-		script.type = "module";
-		script.src = scriptSrc;
-		const timeout = setTimeout(() => {
-			resolve(Boolean(customElements.get(tagName)));
-		}, 8e3);
-		script.onload = async () => {
-			clearTimeout(timeout);
-			loadedScripts.add(cardFile);
-			try {
-				await Promise.race([customElements.whenDefined(tagName), new Promise((r) => setTimeout(r, 2e3))]);
-			} catch {}
-			resolve(Boolean(customElements.get(tagName)));
-		};
-		script.onerror = () => {
-			clearTimeout(timeout);
-			console.error(`Failed to load custom card script: ${scriptSrc}`);
-			resolve(false);
-		};
-		document.head.appendChild(script);
-	});
+	if (!await loadingPromises.get(cardFile)) return checkAndAliasTag(tagName);
+	return checkAndAliasTag(tagName);
 }
 //#endregion
 export { Loader as a, initHaPolyfills as i, ensureCardLoaded as n, fetchCustomCards as r, customCardsStore as t };

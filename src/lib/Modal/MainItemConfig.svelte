@@ -22,6 +22,7 @@
 	import PictureElements from '$lib/Main/PictureElements.svelte';
 	import DaysSince from '$lib/Main/DaysSince.svelte';
 	import WasteCollection from '$lib/Main/WasteCollection.svelte';
+	import Bills from '$lib/Main/Bills.svelte';
 	import CustomCard from '$lib/Main/CustomCard.svelte';
 	import SpotifyPlayer from '$lib/Main/SpotifyPlayer.svelte';
 	import { customCardsStore, fetchCustomCards } from '$lib/Stores/customCards';
@@ -113,6 +114,14 @@
 			id: 'waste_collection',
 			type: $lang('waste_collection') || 'Waste Collection',
 			component: WasteCollection,
+			props: {
+				sel: selected
+			}
+		},
+		{
+			id: 'bills',
+			type: $lang('bills') || 'Bills',
+			component: Bills,
 			props: {
 				sel: selected
 			}
@@ -376,6 +385,11 @@
 				break;
 			case 'waste_collection':
 				openModal(() => import('$lib/Modal/WasteCollectionConfig.svelte'), {
+					sel: selected
+				});
+				break;
+			case 'bills':
+				openModal(() => import('$lib/Modal/BillsConfig.svelte'), {
 					sel: selected
 				});
 				break;

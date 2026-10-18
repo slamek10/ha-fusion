@@ -537,7 +537,7 @@ var options = {
 		app: ({ head, body, assets, nonce, env }) => "<!doctype html>\n<html lang=\"en\">\n	<head>\n		<meta charset=\"utf-8\" />\n		<link rel=\"icon\" href=\"" + assets + "/favicon.png\" />\n		<link rel=\"apple-touch-icon\" href=\"" + assets + "/apple-touch-icon.png\" />\n		<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n		<meta name=\"theme-color\" content=\"#1d2126\" />\n		<link rel=\"manifest\" crossorigin=\"use-credentials\" href=\"/manifest.json\" />\n		" + head + "\n	</head>\n	<body data-sveltekit-preload-data=\"hover\" style=\"background-image: var(--theme-background-image)\">\n		<div style=\"display: contents\">" + body + "</div>\n	</body>\n</html>\n",
 		error: error_template_default
 	},
-	version_hash: "7as6ya"
+	version_hash: "10b3lsn"
 };
 async function get_hooks() {
 	let handle;

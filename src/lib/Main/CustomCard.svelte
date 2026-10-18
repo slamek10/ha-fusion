@@ -59,7 +59,33 @@
 
 	function buildHassMock() {
 		const lang = $selectedLanguage || 'en';
-		const statesMap = $states || {};
+		const rawStates = $states || {};
+		const statesMap = new Proxy(rawStates, {
+			get(target, prop: string) {
+				if (typeof prop === 'string' && prop in target) {
+					return (target as any)[prop];
+				}
+				if (typeof prop === 'string' && prop.includes('.')) {
+					const domain = prop.split('.')[0] || 'sensor';
+					return {
+						entity_id: prop,
+						state: domain === 'climate' ? 'heat' : domain === 'light' ? 'on' : 'off',
+						attributes: {
+							friendly_name: prop,
+							temperature: 21,
+							current_temperature: 21,
+							brightness: 255,
+							hvac_modes: ['off', 'heat', 'cool', 'auto'],
+							min_temp: 7,
+							max_temp: 35
+						},
+						last_changed: new Date().toISOString(),
+						last_updated: new Date().toISOString()
+					};
+				}
+				return (target as any)[prop];
+			}
+		});
 
 		const conn: any = {
 			haVersion: '2026.4.0',
@@ -229,9 +255,6 @@
 				type: `custom:${tagName}`
 			};
 
-			// Pass hass FIRST (cards like mini-climate inspect this.hass during setConfig)
-			el.hass = buildHassMock();
-
 			// Fallback entity if required domain entity is missing in unconfigured state
 			if (!config.entity) {
 				const statesMap = $states || {};
@@ -241,9 +264,20 @@
 				} else if (tagName.includes('light')) {
 					const firstLight = Object.keys(statesMap).find((k) => k.startsWith('light.'));
 					config.entity = firstLight || 'light.living_room';
+				} else if (tagName.includes('cover')) {
+					const firstCover = Object.keys(statesMap).find((k) => k.startsWith('cover.'));
+					config.entity = firstCover || 'cover.living_room';
+				} else if (tagName.includes('media')) {
+					const firstMedia = Object.keys(statesMap).find((k) => k.startsWith('media_player.'));
+					config.entity = firstMedia || 'media_player.spotify';
 				}
 			}
 
+			// Pre-set config properties
+			el.config = config;
+			el._config = config;
+
+			// Home Assistant Lovelace standard: setConfig is ALWAYS called before setting hass
 			if (typeof el.setConfig === 'function') {
 				try {
 					el.setConfig(config);
@@ -257,6 +291,9 @@
 					}
 				}
 			}
+
+			// Pass hass AFTER setConfig so cards (like mini-climate, bubble-card) can access this.config during set hass
+			el.hass = buildHassMock();
 
 			// Listen to events
 			el.addEventListener('hass-more-info', (event: CustomEvent) => {

@@ -17,6 +17,7 @@
 	let SidebarButton: Component<any> = $state(undefined as any);
 	let ObjectButton: Component<any> = $state(undefined as any);
 	let SectionButton: Component<any> = $state(undefined as any);
+	let BillsSectionButton: Component<any> = $state(undefined as any);
 	let HorizontalStackButton: Component<any> = $state(undefined as any);
 	let VerticalStackButton: Component<any> = $state(undefined as any);
 	let ScenesButton: Component<any> = $state(undefined as any);
@@ -26,6 +27,7 @@
 		SidebarButton = (await import('$lib/Drawer/SidebarButton.svelte')).default;
 		ObjectButton = (await import('$lib/Drawer/ObjectButton.svelte')).default;
 		SectionButton = (await import('$lib/Drawer/SectionButton.svelte')).default;
+		BillsSectionButton = (await import('$lib/Drawer/BillsSectionButton.svelte')).default;
 		HorizontalStackButton = (await import('$lib/Drawer/HorizontalStackButton.svelte')).default;
 		VerticalStackButton = (await import('$lib/Drawer/VerticalStackButton.svelte')).default;
 		ScenesButton = (await import('$lib/Drawer/ScenesButton.svelte')).default;
@@ -86,6 +88,10 @@
 			<ObjectButton {view} onclicked={handleClick} />
 
 			<SectionButton {view} onclicked={handleClick} />
+
+			{#if BillsSectionButton}
+				<BillsSectionButton {view} onclicked={handleClick} />
+			{/if}
 
 			<HorizontalStackButton {view} onclicked={handleClick} />
 

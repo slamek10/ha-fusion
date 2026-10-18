@@ -1,7 +1,7 @@
 import { error, json } from "@sveltejs/kit";
 import { readFile, unlink, writeFile } from "fs/promises";
-import path from "path";
 import { existsSync } from "fs";
+import path from "path";
 //#region src/routes/_api/waste_collection/upload/+server.ts
 var POST = async ({ request }) => {
 	try {

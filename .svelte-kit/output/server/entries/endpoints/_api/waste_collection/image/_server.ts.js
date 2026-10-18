@@ -1,7 +1,7 @@
 import { error } from "@sveltejs/kit";
 import { readFile } from "fs/promises";
-import path from "path";
 import { existsSync } from "fs";
+import path from "path";
 //#region src/routes/_api/waste_collection/image/+server.ts
 var CANDIDATE_FILES = [
 	"./data/waste_collection_calendar.png",

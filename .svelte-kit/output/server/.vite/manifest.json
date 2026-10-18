@@ -527,7 +527,7 @@
       "src/lib/Main/Camera/Info.svelte"
     ],
     "css": [
-      "_app/immutable/assets/Index.CKbeZgm9.css"
+      "_app/immutable/assets/Index.H292MnqC.css"
     ]
   },
   "src/lib/Main/Intro.svelte": {
@@ -654,6 +654,30 @@
     "css": [
       "_app/immutable/assets/_page.S_lbxmNq.css"
     ]
+  },
+  "src/routes/_api/bills/+server.ts": {
+    "file": "entries/endpoints/_api/bills/_server.ts.js",
+    "name": "entries/endpoints/_api/bills/_server.ts",
+    "src": "src/routes/_api/bills/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/bills/file/+server.ts": {
+    "file": "entries/endpoints/_api/bills/file/_server.ts.js",
+    "name": "entries/endpoints/_api/bills/file/_server.ts",
+    "src": "src/routes/_api/bills/file/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/bills/scan/+server.ts": {
+    "file": "entries/endpoints/_api/bills/scan/_server.ts.js",
+    "name": "entries/endpoints/_api/bills/scan/_server.ts",
+    "src": "src/routes/_api/bills/scan/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/_api/bills/upload/+server.ts": {
+    "file": "entries/endpoints/_api/bills/upload/_server.ts.js",
+    "name": "entries/endpoints/_api/bills/upload/_server.ts",
+    "src": "src/routes/_api/bills/upload/+server.ts",
+    "isEntry": true
   },
   "src/routes/_api/button_templates/+server.ts": {
     "file": "entries/endpoints/_api/button_templates/_server.ts.js",

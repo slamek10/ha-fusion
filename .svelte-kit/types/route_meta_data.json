@@ -2,6 +2,18 @@
 	"/": [
 		"src/routes/+page.server.ts"
 	],
+	"/_api/bills": [
+		"src/routes/_api/bills/+server.ts"
+	],
+	"/_api/bills/file": [
+		"src/routes/_api/bills/file/+server.ts"
+	],
+	"/_api/bills/scan": [
+		"src/routes/_api/bills/scan/+server.ts"
+	],
+	"/_api/bills/upload": [
+		"src/routes/_api/bills/upload/+server.ts"
+	],
 	"/_api/button_templates": [
 		"src/routes/_api/button_templates/+server.ts"
 	],

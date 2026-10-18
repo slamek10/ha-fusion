@@ -24,7 +24,7 @@ function set_assets(path) {
 }
 //#endregion
 //#region node_modules/.pnpm/@sveltejs+kit@2.69.2_@sveltejs+vite-plugin-svelte@7.2.0_svelte@5.56.8_@typescript-eslin_668f941f5eaf1c1699e3e8090fefc846/node_modules/@sveltejs/kit/src/runtime/app/env/internal.js
-var version = "1791918459076";
+var version = "1792336372618";
 var prerendering = false;
 function set_building() {}
 function set_prerendering() {

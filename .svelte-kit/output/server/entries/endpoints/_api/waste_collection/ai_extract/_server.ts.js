@@ -1,7 +1,7 @@
 import { error, json } from "@sveltejs/kit";
 import { readFile } from "fs/promises";
-import path from "path";
 import { existsSync } from "fs";
+import path from "path";
 //#region src/routes/_api/waste_collection/ai_extract/+server.ts
 var PROMPT = `You are an expert OCR and schedule extraction assistant.
 Analyze this municipal waste collection calendar image (like MURS-EKOM or similar Croatian/European waste management calendar).
@@ -63,8 +63,10 @@ Return ONLY a valid JSON object with no markdown formatting or commentary:
 var POST = async ({ request }) => {
 	try {
 		const body = await request.json();
-		const { apiKey, provider = "gemini", model } = body;
-		if (!apiKey || typeof apiKey !== "string") return error(400, "API key is required for AI extraction");
+		const provider = body.provider || "gemini";
+		const model = body.model;
+		const apiKey = typeof body.apiKey === "string" && body.apiKey.trim() || process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY || process.env.AI_API_KEY || "";
+		if (!apiKey) return error(400, "API key is required for AI extraction (unesite ga u dijaloškom okviru ili postavite GEMINI_API_KEY u okruženju)");
 		let imageBase64 = body.imageBase64;
 		let mimeType = "image/png";
 		if (!imageBase64) {

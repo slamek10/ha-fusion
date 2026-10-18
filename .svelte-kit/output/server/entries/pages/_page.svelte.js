@@ -75,7 +75,7 @@ function _page($$renderer, $$props) {
 		}
 		Theme($$renderer, { initial: data?.theme });
 		$$renderer.push(`<!----> <div id="layout" class="svelte-1uha8ag"${attr_style("", {
-			"grid-template-columns": `${stringify(store_get($$store_subs ??= {}, "$dashboard", dashboard)?.hide_sidebar || !store_get($$store_subs ??= {}, "$dashboard", dashboard)?.sidebar?.length ? "0" : store_get($$store_subs ??= {}, "$dashboard", dashboard)?.sidebarWidth || 210)}px auto`,
+			"grid-template-columns": `${stringify(store_get($$store_subs ??= {}, "$dashboard", dashboard)?.hide_sidebar || !store_get($$store_subs ??= {}, "$dashboard", dashboard)?.sidebar?.length ? "0" : store_get($$store_subs ??= {}, "$dashboard", dashboard)?.sidebarWidth || 210)}px minmax(0, 1fr)`,
 			"grid-template-rows": store_get($$store_subs ??= {}, "$showDrawer", showDrawer) ? "auto auto 1fr" : "0fr auto 1fr",
 			transition: `grid-template-rows ${stringify(store_get($$store_subs ??= {}, "$motion", motion))}ms ease, grid-template-columns ${stringify(store_get($$store_subs ??= {}, "$motion", motion))}ms ease`
 		})}>`);

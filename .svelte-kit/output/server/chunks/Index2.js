@@ -1203,7 +1203,7 @@ function DaysSince($$renderer, $$props) {
 var wasteCollectionStore = writable({
 	calendar_image: "/_api/waste_collection/image",
 	has_calendar_image: false,
-	location: "Grad Mursko Središće",
+	location: "Općina Vratišinec",
 	year: 2026,
 	categories: []
 });
@@ -1219,7 +1219,7 @@ function formatCroatianDays(days) {
 	if (mod10 === 1 && mod100 !== 11) return `Sljedeće za ${days} dan`;
 	else return `Sljedeće za ${days} dana`;
 }
-function formatDateHR(isoStr) {
+function formatDateHR$1(isoStr) {
 	if (!isoStr) return "";
 	const [y, m, d] = isoStr.split("-");
 	if (!y || !m || !d) return isoStr;
@@ -1231,7 +1231,7 @@ function formatCollectionCountdown(days, dateIsoStr, options) {
 	const customFormat = options?.format?.trim();
 	if (days === 0) return todayText;
 	if (days === 1 && tomorrowText) return tomorrowText;
-	const dateHr = dateIsoStr ? formatDateHR(dateIsoStr) : "";
+	const dateHr = dateIsoStr ? formatDateHR$1(dateIsoStr) : "";
 	if (customFormat) {
 		const mod10 = days % 10;
 		const mod100 = days % 100;
@@ -1269,7 +1269,7 @@ function getNextCollection(dates, referenceDate = /* @__PURE__ */ new Date(), op
 		nextDate,
 		daysUntil,
 		formattedText: formatCollectionCountdown(daysUntil, nextDate, options),
-		formattedDate: formatDateHR(nextDate),
+		formattedDate: formatDateHR$1(nextDate),
 		allUpcoming: upcoming
 	};
 }
@@ -1337,12 +1337,667 @@ function WasteCollection($$renderer, $$props) {
 	});
 }
 //#endregion
+//#region src/lib/Stores/bills.ts
+var billsStore = writable({
+	settings: {
+		currency: "€",
+		paycheck_day: 15,
+		bills_arrival_day: 5,
+		ai_provider: "gemini",
+		ai_model: "gemini-2.5-flash",
+		ai_api_key: ""
+	},
+	types: [],
+	bills: []
+});
+writable(false);
+function createDefaultBill(type, month, currency = "€") {
+	const isFixed = Boolean(type.fixed_amount);
+	const isAutoPay = Boolean(type.auto_pay);
+	const defaultAmount = typeof type.expected_amount === "number" ? type.expected_amount : 0;
+	const dueDate = `${month}-${type.due_day ? String(type.due_day).padStart(2, "0") : "20"}`;
+	const todayStr = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+	let subBills = void 0;
+	if (type.sub_types && type.sub_types.length > 0) {
+		const perSubAmount = defaultAmount > 0 ? Math.round(defaultAmount / type.sub_types.length * 100) / 100 : 0;
+		subBills = type.sub_types.map((subName, index) => ({
+			id: `sub_${type.id}_${index}_${Math.random().toString(36).substring(2, 6)}`,
+			title: subName,
+			amount: perSubAmount,
+			paid: isAutoPay,
+			paid_date: isAutoPay ? todayStr : null,
+			due_date: dueDate
+		}));
+	}
+	return {
+		id: `bill_${type.id}_${month}_${Math.random().toString(36).substring(2, 6)}`,
+		type_id: type.id,
+		title: type.name,
+		provider: type.provider || type.name,
+		amount: defaultAmount,
+		currency,
+		month,
+		due_date: dueDate,
+		paid: isAutoPay,
+		paid_date: isAutoPay ? todayStr : null,
+		notes: type.notes || void 0,
+		sub_bills: subBills,
+		auto_pay: isAutoPay,
+		fixed_amount: isFixed,
+		created_at: (/* @__PURE__ */ new Date()).toISOString()
+	};
+}
+function formatCurrency(amount, symbol = "€") {
+	if (amount === null || amount === void 0 || isNaN(amount)) return `0.00 ${symbol}`;
+	return `${amount.toFixed(2)} ${symbol}`;
+}
+function formatDateHR(dateStr) {
+	if (!dateStr) return "";
+	const [y, m, d] = dateStr.split("-");
+	if (!y || !m || !d) return dateStr;
+	return `${parseInt(d, 10)}.${parseInt(m, 10)}.${y}.`;
+}
+function getCurrentMonthStr() {
+	const now = /* @__PURE__ */ new Date();
+	return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+function getMonthLabel(monthStr) {
+	const [y, m] = monthStr.split("-").map(Number);
+	if (!y || !m) return monthStr;
+	const monthName = new Date(y, m - 1, 1).toLocaleDateString("hr-HR", {
+		month: "long",
+		year: "numeric"
+	});
+	return monthName.charAt(0).toUpperCase() + monthName.slice(1);
+}
+function getMonthStats(bills, month, types, paycheckDay = 15, arrivalDay = 5, currency = "€", dismissedTypeIds = []) {
+	const existingMonthBills = bills.filter((b) => b.month === month);
+	const existingTypeIds = new Set(existingMonthBills.map((b) => b.type_id));
+	const virtualBills = [];
+	for (const type of types) if (!existingTypeIds.has(type.id) && !dismissedTypeIds.includes(type.id)) {
+		if (type.fixed_amount) virtualBills.push(createDefaultBill(type, month, currency));
+	}
+	const monthBills = [...existingMonthBills, ...virtualBills];
+	let totalAmount = 0;
+	let unpaidAmount = 0;
+	let paidAmount = 0;
+	let paidCount = 0;
+	let unpaidCount = 0;
+	for (const bill of monthBills) if (bill.sub_bills && bill.sub_bills.length > 0) {
+		let billTotal = 0;
+		let billUnpaid = 0;
+		let billPaid = 0;
+		let allSubPaid = true;
+		for (const sub of bill.sub_bills) {
+			const sAmt = typeof sub.amount === "number" ? sub.amount : 0;
+			billTotal += sAmt;
+			if (sub.paid) billPaid += sAmt;
+			else {
+				billUnpaid += sAmt;
+				allSubPaid = false;
+			}
+		}
+		totalAmount += billTotal;
+		paidAmount += billPaid;
+		unpaidAmount += billUnpaid;
+		if (allSubPaid) paidCount++;
+		else unpaidCount++;
+	} else {
+		const amt = typeof bill.amount === "number" ? bill.amount : 0;
+		totalAmount += amt;
+		if (bill.paid) {
+			paidAmount += amt;
+			paidCount++;
+		} else {
+			unpaidAmount += amt;
+			unpaidCount++;
+		}
+	}
+	const totalCount = monthBills.length;
+	const percentPaid = totalAmount > 0 ? Math.round(paidAmount / totalAmount * 100) : totalCount > 0 && unpaidCount === 0 ? 100 : 0;
+	const now = /* @__PURE__ */ new Date();
+	const currentDay = now.getDate();
+	const isCurrentMonth = month === getCurrentMonthStr();
+	let isAfterPaycheck = currentDay >= paycheckDay;
+	let daysUntilPaycheck = 0;
+	let paycheckText = "";
+	let paycheckState = "ready";
+	if (isCurrentMonth) if (currentDay < paycheckDay) {
+		daysUntilPaycheck = paycheckDay - currentDay;
+		paycheckState = "waiting";
+		if (currentDay >= arrivalDay) paycheckText = `Računi stižu oko ${arrivalDay}. u mjesecu. Čeka se plaća (${paycheckDay}.) za plaćanje — još ${daysUntilPaycheck} ${daysUntilPaycheck === 1 ? "dan" : daysUntilPaycheck < 5 ? "dana" : "dana"}.`;
+		else paycheckText = `Očekivanje računa (oko ${arrivalDay}. u mjesecu) i plaće (${paycheckDay}.). Još ${daysUntilPaycheck} dana do plaće.`;
+	} else {
+		paycheckState = "ready";
+		paycheckText = `Plaća je sjela (${paycheckDay}. u mjesecu)! Vrijeme je za plaćanje prispjelih računa.`;
+	}
+	else {
+		const [viewY, viewM] = month.split("-").map(Number);
+		if (new Date(viewY, viewM - 1, 1) < new Date(now.getFullYear(), now.getMonth(), 1)) {
+			paycheckState = "ready";
+			paycheckText = `Arhiva računa za ${getMonthLabel(month)}.`;
+		} else {
+			paycheckState = "upcoming";
+			paycheckText = `Nadolazeći mjesec: plaća ${paycheckDay}., računi stižu oko ${arrivalDay}.`;
+		}
+	}
+	const byType = types.map((type) => {
+		const typeBills = monthBills.filter((b) => b.type_id === type.id);
+		let typeUnpaid = 0;
+		let typePaid = 0;
+		let typeTotal = 0;
+		for (const b of typeBills) if (b.sub_bills && b.sub_bills.length > 0) for (const s of b.sub_bills) {
+			const sa = typeof s.amount === "number" ? s.amount : 0;
+			typeTotal += sa;
+			if (s.paid) typePaid += sa;
+			else typeUnpaid += sa;
+		}
+		else {
+			const a = typeof b.amount === "number" ? b.amount : 0;
+			typeTotal += a;
+			if (b.paid) typePaid += a;
+			else typeUnpaid += a;
+		}
+		const isFixed = Boolean(type.fixed_amount);
+		const expected = typeof type.expected_amount === "number" ? type.expected_amount : 0;
+		const hasAnyBill = typeBills.length > 0;
+		return {
+			type,
+			bills: typeBills,
+			unpaid: hasAnyBill ? typeUnpaid : isFixed ? type.auto_pay ? 0 : expected : 0,
+			paid: hasAnyBill ? typePaid : isFixed ? type.auto_pay ? expected : 0 : 0,
+			total: typeTotal > 0 ? typeTotal : isFixed ? expected : 0,
+			hasBill: hasAnyBill || isFixed,
+			allPaid: typeBills.length > 0 ? typeBills.every((b) => b.paid) : Boolean(type.auto_pay)
+		};
+	});
+	const providerMap = /* @__PURE__ */ new Map();
+	for (const b of monthBills) {
+		const matchedType = types.find((t) => t.id === b.type_id);
+		const providerName = b.provider || matchedType?.provider || matchedType?.name || "Ostalo";
+		if (!providerMap.has(providerName)) providerMap.set(providerName, {
+			bills: [],
+			unpaid: 0,
+			paid: 0,
+			total: 0
+		});
+		const group = providerMap.get(providerName);
+		group.bills.push(b);
+		if (b.sub_bills && b.sub_bills.length > 0) for (const s of b.sub_bills) {
+			const sa = typeof s.amount === "number" ? s.amount : 0;
+			group.total += sa;
+			if (s.paid) group.paid += sa;
+			else group.unpaid += sa;
+		}
+		else {
+			const a = typeof b.amount === "number" ? b.amount : 0;
+			group.total += a;
+			if (b.paid) group.paid += a;
+			else group.unpaid += a;
+		}
+	}
+	const byProvider = Array.from(providerMap.entries()).map(([provider, data]) => ({
+		provider,
+		bills: data.bills,
+		unpaid: data.unpaid,
+		paid: data.paid,
+		total: data.total,
+		allPaid: data.bills.length > 0 && data.unpaid === 0
+	}));
+	return {
+		monthBills,
+		totalAmount,
+		unpaidAmount,
+		paidAmount,
+		paidCount,
+		unpaidCount,
+		totalCount,
+		percentPaid,
+		paycheckStatus: {
+			isAfterPaycheck,
+			daysUntilPaycheck,
+			text: paycheckText,
+			state: paycheckState
+		},
+		byType,
+		byProvider
+	};
+}
+//#endregion
+//#region src/lib/Modal/BillFormModal.svelte
+function BillFormModal($$renderer, $$props) {
+	$$renderer.component(($$renderer) => {
+		var $$store_subs;
+		let { isOpen = true, bill = void 0, defaultMonth = void 0, onClose = () => {} } = $$props;
+		const isEditing = Boolean(bill?.id);
+		let typeId = bill?.type_id || store_get($$store_subs ??= {}, "$billsStore", billsStore).types[0]?.id || "internet";
+		let provider = bill?.provider || "";
+		let title = bill?.title || "";
+		let amount = bill?.amount;
+		let month = bill?.month || defaultMonth || getCurrentMonthStr();
+		let issueDate = bill?.issue_date || (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+		let dueDate = bill?.due_date || "";
+		let paid = bill?.paid || false;
+		let paidDate = bill?.paid_date || "";
+		let notes = bill?.notes || "";
+		let fileUrl = bill?.file_url || null;
+		let fileName = bill?.file_name || null;
+		let fileType = bill?.file_type || null;
+		let subBills = bill?.sub_bills ? JSON.parse(JSON.stringify(bill.sub_bills)) : [];
+		Boolean(bill?.sub_bills && bill.sub_bills.length > 0);
+		let isFixedAmount = Boolean(bill?.fixed_amount ?? false);
+		let uploading = false;
+		let aiScanning = false;
+		let currency = derived(() => store_get($$store_subs ??= {}, "$billsStore", billsStore).settings?.currency || "€");
+		let selectedType = derived(() => store_get($$store_subs ??= {}, "$billsStore", billsStore).types.find((t) => t.id === typeId));
+		if (isOpen) {
+			$$renderer.push("<!--[0-->");
+			$$renderer.push(`<div class="modal-backdrop svelte-146p6rp"><div class="modal-card svelte-146p6rp"><div class="modal-header svelte-146p6rp"><div class="title-with-icon svelte-146p6rp">`);
+			Icon($$renderer, {
+				icon: "mdi:receipt-text",
+				class: "modal-title-icon"
+			});
+			$$renderer.push(`<!----> <h3 class="svelte-146p6rp">${escape_html(isEditing ? "Uredi račun" : "Dodaj / Učitaj račun")}</h3></div> <button type="button" class="close-btn svelte-146p6rp">`);
+			Icon($$renderer, { icon: "mdi:close" });
+			$$renderer.push(`<!----></button></div> <div class="modal-content svelte-146p6rp"><div class="upload-section svelte-146p6rp"><label${attr_class("dropzone svelte-146p6rp", void 0, { "active": aiScanning })}><input type="file" accept="application/pdf,image/png,image/jpeg,image/webp" style="display: none;"/> `);
+			if (fileName) {
+				$$renderer.push("<!--[1-->");
+				Icon($$renderer, {
+					icon: fileType?.includes("pdf") ? "mdi:file-pdf-box" : "mdi:file-image",
+					class: "dropzone-icon active"
+				});
+				$$renderer.push(`<!----> <div class="file-uploaded-info svelte-146p6rp"><span class="file-name svelte-146p6rp">${escape_html(fileName)}</span> <span class="file-change-hint svelte-146p6rp">Kliknite za zamjenu datoteke računa</span></div>`);
+			} else {
+				$$renderer.push("<!--[-1-->");
+				Icon($$renderer, {
+					icon: "mdi:cloud-upload-outline",
+					class: "dropzone-icon"
+				});
+				$$renderer.push(`<!----> <div class="dropzone-text-group svelte-146p6rp"><span class="dropzone-main svelte-146p6rp">Prenesi PDF ili sliku računa s emaila</span> <span class="dropzone-sub svelte-146p6rp">Automatski očitavamo iznos i podatke s računa</span></div>`);
+			}
+			$$renderer.push(`<!--]--></label> `);
+			$$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--> `);
+			$$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--></div> <div class="form-grid svelte-146p6rp"><div class="form-group svelte-146p6rp"><label for="bill-type-select" class="svelte-146p6rp">Vrsta računa *</label> `);
+			$$renderer.select({
+				id: "bill-type-select",
+				value: typeId,
+				class: "text-input"
+			}, ($$renderer) => {
+				$$renderer.push(`<!--[-->`);
+				const each_array = ensure_array_like(store_get($$store_subs ??= {}, "$billsStore", billsStore).types);
+				for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
+					let t = each_array[$$index];
+					$$renderer.option({ value: t.id }, ($$renderer) => {
+						$$renderer.push(`${escape_html(t.name)} ${escape_html(t.provider ? `(${t.provider})` : "")}`);
+					});
+				}
+				$$renderer.push(`<!--]-->`);
+			}, "svelte-146p6rp");
+			$$renderer.push(`</div> <div class="form-group svelte-146p6rp"><label for="bill-provider-input" class="svelte-146p6rp">Pružatelj / Izdavatelj</label> <input id="bill-provider-input" type="text"${attr("value", provider)} placeholder="npr. Uniqa Osiguranje, A1, HEP..." class="text-input svelte-146p6rp"/></div> <div class="form-group svelte-146p6rp"><label for="bill-title-input" class="svelte-146p6rp">Naziv / Opis</label> <input id="bill-title-input" type="text"${attr("value", title)} placeholder="npr. Uniqa Osiguranja - Paket" class="text-input svelte-146p6rp"/></div> <div class="form-group amount-group svelte-146p6rp"><label for="bill-amount-input" class="svelte-146p6rp">Iznos računa * (${escape_html(currency())}) `);
+			if (subBills.length > 0) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<span class="auto-sum-badge svelte-146p6rp">(Zbroj ${escape_html(subBills.length)} stavki)</span>`);
+			} else $$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--></label> <div class="amount-input-wrapper svelte-146p6rp"><span class="currency-prefix svelte-146p6rp">${escape_html(currency())}</span> <input id="bill-amount-input" type="number" step="0.01" min="0"${attr("value", amount)}${attr("readonly", subBills.length > 0, true)} placeholder="0.00" class="text-input amount-input svelte-146p6rp"/></div> <label class="modal-inline-checkbox svelte-146p6rp"><input type="checkbox"${attr("checked", isFixedAmount, true)} class="checkbox-input-sm svelte-146p6rp"/> <span>Isti iznos svaki mjesec (fiksno kao Netflix, osiguranje)</span></label></div> <div class="form-group svelte-146p6rp"><label for="bill-month-input" class="svelte-146p6rp">Mjesec računa (GGGG-MM) *</label> <input id="bill-month-input" type="month"${attr("value", month)} class="text-input svelte-146p6rp"/></div> <div class="form-group svelte-146p6rp"><label for="bill-due-input" class="svelte-146p6rp">Rok plaćanja (dospijeće)</label> <input id="bill-due-input" type="date"${attr("value", dueDate)} class="text-input svelte-146p6rp"/></div> <div class="form-group svelte-146p6rp"><label for="bill-issue-input" class="svelte-146p6rp">Datum izdavanja računa</label> <input id="bill-issue-input" type="date"${attr("value", issueDate)} class="text-input svelte-146p6rp"/></div></div> <div class="sub-bills-card svelte-146p6rp"><div class="sub-bills-header svelte-146p6rp"><div class="sub-bills-title-group svelte-146p6rp">`);
+			Icon($$renderer, {
+				icon: "mdi:format-list-checks",
+				class: "sub-bills-icon"
+			});
+			$$renderer.push(`<!----> <div class="sub-bills-titles svelte-146p6rp"><span class="sub-bills-title svelte-146p6rp">Stavke i podračuni</span> <span class="sub-bills-desc svelte-146p6rp">Npr. Kuća, Vanjsko osiguranje, Zdravstveno (Uniqa)</span></div></div> <div class="sub-bills-header-actions svelte-146p6rp">`);
+			if (selectedType()?.sub_types && selectedType().sub_types.length > 0) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<button type="button" class="btn-sub-pill outline svelte-146p6rp"${attr("title", `Učitaj unaprijed definirane stavke za ${stringify(selectedType().name)}`)}>`);
+				Icon($$renderer, { icon: "mdi:auto-fix" });
+				$$renderer.push(`<!----> <span>Učitaj predloške (${escape_html(selectedType().sub_types.length)})</span></button>`);
+			} else $$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--> <button type="button" class="btn-sub-pill primary svelte-146p6rp">`);
+			Icon($$renderer, { icon: "mdi:plus" });
+			$$renderer.push(`<!----> <span>Dodaj stavku</span></button></div></div> `);
+			if (subBills.length > 0) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<div class="sub-bills-list svelte-146p6rp"><!--[-->`);
+				const each_array_1 = ensure_array_like(subBills);
+				for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
+					let sub = each_array_1[$$index_1];
+					$$renderer.push(`<div${attr_class("sub-bill-row svelte-146p6rp", void 0, { "paid": sub.paid })}><div class="sub-bill-col-title svelte-146p6rp"><input type="text"${attr("value", sub.title)} placeholder="Naziv stavke (npr. Osiguranje kuće)" class="text-input small svelte-146p6rp"/></div> <div class="sub-bill-col-amount svelte-146p6rp"><div class="amount-input-wrapper small svelte-146p6rp"><span class="currency-prefix svelte-146p6rp">${escape_html(currency())}</span> <input type="number" step="0.01" min="0"${attr("value", sub.amount)} placeholder="0.00" class="text-input amount-input small svelte-146p6rp"/></div></div> <div class="sub-bill-col-status"><button type="button"${attr_class("btn-sub-status svelte-146p6rp", void 0, { "paid": sub.paid })}>`);
+					Icon($$renderer, { icon: sub.paid ? "mdi:check-circle" : "mdi:clock-outline" });
+					$$renderer.push(`<!----> <span>${escape_html(sub.paid ? "Plaćeno" : "Neplaćeno")}</span></button></div> <div class="sub-bill-col-actions"><button type="button" class="btn-sub-delete svelte-146p6rp" title="Ukloni stavku">`);
+					Icon($$renderer, { icon: "mdi:trash-can-outline" });
+					$$renderer.push(`<!----></button></div></div>`);
+				}
+				$$renderer.push(`<!--]--> <div class="sub-bills-summary svelte-146p6rp"><span class="summary-label svelte-146p6rp">Ukupno (${escape_html(subBills.length)}
+                  ${escape_html(subBills.length === 1 ? "stavka" : "stavki")}):</span> <span class="summary-amount svelte-146p6rp">${escape_html(amount?.toFixed(2) || "0.00")}
+                  ${escape_html(currency())}</span> `);
+				if (subBills.some((s) => !s.paid)) {
+					$$renderer.push("<!--[0-->");
+					$$renderer.push(`<span class="summary-unpaid-badge svelte-146p6rp">Preostalo za platiti: ${escape_html(subBills.filter((s) => !s.paid).reduce((sum, s) => sum + (Number(s.amount) || 0), 0).toFixed(2))}
+                    ${escape_html(currency())}</span>`);
+				} else {
+					$$renderer.push("<!--[-1-->");
+					$$renderer.push(`<span class="summary-all-paid-badge svelte-146p6rp">`);
+					Icon($$renderer, { icon: "mdi:check-all" });
+					$$renderer.push(`<!----> Sve stavke plaćene</span>`);
+				}
+				$$renderer.push(`<!--]--></div></div>`);
+			} else {
+				$$renderer.push("<!--[-1-->");
+				$$renderer.push(`<div class="sub-bills-empty-hint svelte-146p6rp"><span>Nema pojedinačnih podračuna. Račun možete unijeti kao cjelinu
+                ili kliknuti <strong>+ Dodaj stavku</strong> za raščlanjeno praćenje.</span></div>`);
+			}
+			$$renderer.push(`<!--]--></div> <div${attr_class("status-toggle-card svelte-146p6rp", void 0, { "paid": paid })}><div class="status-left svelte-146p6rp"><div class="status-icon-box svelte-146p6rp">`);
+			Icon($$renderer, { icon: paid ? "mdi:check-circle" : "mdi:clock-alert-outline" });
+			$$renderer.push(`<!----></div> <div class="status-texts svelte-146p6rp"><span class="status-heading svelte-146p6rp">${escape_html(paid ? "Račun je PLAĆEN" : "Račun NIJE plaćen")}</span> <span class="status-sub svelte-146p6rp">${escape_html(paid ? "Iznos se ubraja u plaćene račune" : "Iznos se prikazuje kao preostalo za platiti")}</span></div></div> <button type="button"${attr_class("toggle-btn svelte-146p6rp", void 0, { "paid": paid })}><span class="toggle-indicator svelte-146p6rp"></span> <span class="toggle-label">${escape_html(paid ? "Plaćeno" : "Neplaćeno")}</span></button></div> `);
+			if (paid) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<div class="form-group svelte-146p6rp"><label for="bill-paid-date-input" class="svelte-146p6rp">Datum plaćanja</label> <input id="bill-paid-date-input" type="date"${attr("value", paidDate)} class="text-input svelte-146p6rp"/></div>`);
+			} else $$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--> `);
+			if (fileUrl) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<div class="attachment-preview-bar svelte-146p6rp">`);
+				Icon($$renderer, {
+					icon: fileType?.includes("pdf") ? "mdi:file-pdf-box" : "mdi:file-image",
+					class: "preview-icon"
+				});
+				$$renderer.push(`<!----> <div class="preview-meta svelte-146p6rp"><span class="file-title svelte-146p6rp">${escape_html(fileName)}</span> <a${attr("href", fileUrl)} target="_blank" rel="noreferrer" class="view-link svelte-146p6rp">Otvori / pregledaj račun `);
+				Icon($$renderer, { icon: "mdi:open-in-new" });
+				$$renderer.push(`<!----></a></div> <button type="button" class="remove-file-btn svelte-146p6rp" title="Ukloni datoteku">`);
+				Icon($$renderer, { icon: "mdi:trash-can-outline" });
+				$$renderer.push(`<!----></button></div>`);
+			} else $$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--> <div class="form-group svelte-146p6rp"><label for="bill-notes-input" class="svelte-146p6rp">Napomena / Poziv na broj (opcionalno)</label> <input id="bill-notes-input" type="text"${attr("value", notes)} placeholder="npr. Platiti s tekućeg računa nakon plaće" class="text-input svelte-146p6rp"/></div></div> <div class="modal-footer svelte-146p6rp"><button type="button" class="btn-cancel svelte-146p6rp">Odustani</button> <button type="button" class="btn-submit svelte-146p6rp"${attr("disabled", uploading, true)}>`);
+			Icon($$renderer, { icon: "mdi:check" });
+			$$renderer.push(`<!----> <span>${escape_html(isEditing ? "Ažuriraj račun" : "Spremi račun")}</span></button></div></div></div>`);
+		} else $$renderer.push("<!--[-1-->");
+		$$renderer.push(`<!--]-->`);
+		if ($$store_subs) unsubscribe_stores($$store_subs);
+	});
+}
+//#endregion
+//#region src/lib/Main/Bills.svelte
+function Bills($$renderer, $$props) {
+	$$renderer.component(($$renderer) => {
+		var $$store_subs;
+		let { sel, sectionName = void 0 } = $$props;
+		let selectedMonth = getCurrentMonthStr();
+		let filterTypeId = null;
+		let showBillForm = false;
+		let activeBillToEdit = void 0;
+		let groupByProvider = false;
+		let expandedBillIds = {};
+		let currency = derived(() => store_get($$store_subs ??= {}, "$billsStore", billsStore).settings?.currency || "€");
+		let paycheckDay = derived(() => store_get($$store_subs ??= {}, "$billsStore", billsStore).settings?.paycheck_day ?? 15);
+		let arrivalDay = derived(() => store_get($$store_subs ??= {}, "$billsStore", billsStore).settings?.bills_arrival_day ?? 5);
+		let dismissedList = derived(() => store_get($$store_subs ??= {}, "$billsStore", billsStore).dismissed_types && store_get($$store_subs ??= {}, "$billsStore", billsStore).dismissed_types[selectedMonth] || []);
+		let stats = derived(() => getMonthStats(store_get($$store_subs ??= {}, "$billsStore", billsStore).bills || [], selectedMonth, store_get($$store_subs ??= {}, "$billsStore", billsStore).types || [], paycheckDay(), arrivalDay(), currency(), dismissedList()));
+		let filteredBills = derived(() => stats().monthBills.filter((b) => {
+			return true;
+		}));
+		function renderBillRow($$renderer, bill) {
+			const billType = store_get($$store_subs ??= {}, "$billsStore", billsStore).types.find((t) => t.id === bill.type_id);
+			const isExpanded = expandedBillIds[bill.id] ?? true;
+			const isAutoPay = Boolean(bill.auto_pay ?? billType?.auto_pay);
+			const isFixed = Boolean(bill.fixed_amount ?? billType?.fixed_amount);
+			$$renderer.push(`<div class="bill-row-wrapper svelte-1i9o3mz"><div${attr_class("bill-row svelte-1i9o3mz", void 0, { "is-paid": bill.paid })}><div class="bill-type-icon svelte-1i9o3mz"${attr_style("", { "background-color": billType?.color || "#2196f3" })}>`);
+			Icon($$renderer, {
+				icon: billType?.icon || "mdi:receipt-text",
+				height: "1.15rem"
+			});
+			$$renderer.push(`<!----></div> <div class="bill-info svelte-1i9o3mz"><div class="bill-title-row svelte-1i9o3mz"><span class="bill-title svelte-1i9o3mz">${escape_html(bill.title || billType?.name || "Račun")}</span> `);
+			if (bill.provider || billType?.provider) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<span class="bill-provider-tag svelte-1i9o3mz">${escape_html(bill.provider || billType?.provider)}</span>`);
+			} else $$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--> `);
+			if (isAutoPay) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<span class="bill-badge autopay svelte-1i9o3mz" title="Automatsko plaćanje (trajni nalog / tereti se automatski)">`);
+				Icon($$renderer, { icon: "mdi:autorenew" });
+				$$renderer.push(`<!----> <span>Automatsko</span></span>`);
+			} else $$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--> `);
+			if (isFixed) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<span class="bill-badge fixed svelte-1i9o3mz" title="Isti iznos svaki mjesec (fiksni iznos)">`);
+				Icon($$renderer, { icon: "mdi:lock-outline" });
+				$$renderer.push(`<!----> <span>Fiksno</span></span>`);
+			} else $$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--> `);
+			if (bill.sub_bills && bill.sub_bills.length > 0) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<button type="button" class="sub-bills-count-badge svelte-1i9o3mz" title="Prikaži/sakrij pojedinačne stavke">`);
+				Icon($$renderer, { icon: "mdi:format-list-checks" });
+				$$renderer.push(`<!----> <span>${escape_html(bill.sub_bills.filter((s) => s.paid).length)}/${escape_html(bill.sub_bills.length)} stavki</span> `);
+				Icon($$renderer, { icon: isExpanded ? "mdi:chevron-up" : "mdi:chevron-down" });
+				$$renderer.push(`<!----></button>`);
+			} else $$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--> `);
+			if (bill.file_url) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<button type="button" class="attachment-pill svelte-1i9o3mz"${attr("title", `Pregledaj račun (${stringify(bill.file_name)})`)}>`);
+				Icon($$renderer, { icon: "mdi:file-document-outline" });
+				$$renderer.push(`<!----> <span>Dokument</span></button>`);
+			} else {
+				$$renderer.push("<!--[-1-->");
+				$$renderer.push(`<button type="button" class="attachment-pill empty svelte-1i9o3mz" title="Priloži račun (PDF/slika)">`);
+				Icon($$renderer, { icon: "mdi:paperclip" });
+				$$renderer.push(`<!----> <span>Priloži PDF</span></button>`);
+			}
+			$$renderer.push(`<!--]--></div> <div class="bill-dates-row svelte-1i9o3mz">`);
+			if (bill.due_date) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<span${attr_class("date-chip svelte-1i9o3mz", void 0, { "overdue": !bill.paid })}>`);
+				Icon($$renderer, { icon: "mdi:calendar-alert" });
+				$$renderer.push(`<!----> Dospijeće: ${escape_html(formatDateHR(bill.due_date))}</span>`);
+			} else $$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--> `);
+			if (bill.paid && bill.paid_date) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<span class="date-chip paid svelte-1i9o3mz">`);
+				Icon($$renderer, { icon: "mdi:check-circle" });
+				$$renderer.push(`<!----> Plaćeno: ${escape_html(formatDateHR(bill.paid_date))}</span>`);
+			} else $$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--> `);
+			if (bill.notes) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<span class="bill-notes-text svelte-1i9o3mz">${escape_html(bill.notes)}</span>`);
+			} else $$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--></div></div> <div class="bill-amount-wrap svelte-1i9o3mz"><button type="button" class="bill-amount-btn svelte-1i9o3mz" title="Kliknite za izmjenu iznosa"><span${attr_class("bill-amount-text svelte-1i9o3mz", void 0, { "paid": bill.paid })}>${escape_html(formatCurrency(bill.amount, bill.currency || currency()))}</span> `);
+			Icon($$renderer, {
+				icon: "mdi:pencil-outline",
+				class: "amount-edit-icon"
+			});
+			$$renderer.push(`<!----></button> `);
+			if ((!bill.amount || bill.amount === 0) && !bill.paid) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<span class="amount-zero-hint svelte-1i9o3mz">Unesite iznos</span>`);
+			} else $$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--></div> <div class="bill-actions svelte-1i9o3mz"><button type="button"${attr_class("btn-pay-toggle svelte-1i9o3mz", void 0, { "paid": bill.paid })}${attr("title", bill.paid ? "Kliknite za poništenje plaćanja (sve stavke)" : "Kliknite za označiti račun i sve stavke kao plaćene")}>`);
+			if (bill.paid) {
+				$$renderer.push("<!--[0-->");
+				Icon($$renderer, { icon: "mdi:check" });
+				$$renderer.push(`<!----> <span>Plaćeno</span>`);
+			} else {
+				$$renderer.push("<!--[-1-->");
+				Icon($$renderer, { icon: "mdi:credit-card-outline" });
+				$$renderer.push(`<!----> <span>Plati</span>`);
+			}
+			$$renderer.push(`<!--]--></button> <button type="button" class="btn-row-action svelte-1i9o3mz" title="Uredi račun">`);
+			Icon($$renderer, { icon: "mdi:pencil" });
+			$$renderer.push(`<!----></button> <button type="button" class="btn-row-action delete svelte-1i9o3mz" title="Obriši račun">`);
+			Icon($$renderer, { icon: "mdi:trash-can-outline" });
+			$$renderer.push(`<!----></button></div></div> `);
+			if (bill.sub_bills && bill.sub_bills.length > 0 && isExpanded) {
+				$$renderer.push("<!--[0-->");
+				$$renderer.push(`<div class="sub-bills-tray svelte-1i9o3mz"><div class="sub-tray-header svelte-1i9o3mz">`);
+				Icon($$renderer, {
+					icon: "mdi:subdirectory-arrow-right",
+					class: "sub-arrow"
+				});
+				$$renderer.push(`<!----> <span class="sub-tray-title">Pojedinačni podračuni i stavke:</span></div> <div class="sub-tray-items svelte-1i9o3mz"><!--[-->`);
+				const each_array = ensure_array_like(bill.sub_bills);
+				for (let $$index_4 = 0, $$length = each_array.length; $$index_4 < $$length; $$index_4++) {
+					let sub = each_array[$$index_4];
+					$$renderer.push(`<div${attr_class("sub-tray-item svelte-1i9o3mz", void 0, { "is-paid": sub.paid })}><div class="sub-tray-left svelte-1i9o3mz">`);
+					Icon($$renderer, {
+						icon: sub.paid ? "mdi:check-circle" : "mdi:circle-outline",
+						class: "sub-status-bullet"
+					});
+					$$renderer.push(`<!----> <span class="sub-tray-name svelte-1i9o3mz">${escape_html(sub.title)}</span></div> <div class="sub-tray-right svelte-1i9o3mz"><span${attr_class("sub-tray-amt svelte-1i9o3mz", void 0, { "is-paid": sub.paid })}>${escape_html(formatCurrency(sub.amount, bill.currency || currency()))}</span> <button type="button"${attr_class("btn-sub-pay svelte-1i9o3mz", void 0, { "paid": sub.paid })}${attr("title", sub.paid ? "Poništi plaćanje ove stavke" : "Označi stavku kao plaćenu")}>`);
+					if (sub.paid) {
+						$$renderer.push("<!--[0-->");
+						Icon($$renderer, { icon: "mdi:check" });
+						$$renderer.push(`<!----> <span>Plaćeno</span>`);
+					} else {
+						$$renderer.push("<!--[-1-->");
+						Icon($$renderer, { icon: "mdi:credit-card-outline" });
+						$$renderer.push(`<!----> <span>Plati</span>`);
+					}
+					$$renderer.push(`<!--]--></button></div></div>`);
+				}
+				$$renderer.push(`<!--]--></div></div>`);
+			} else $$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--></div>`);
+		}
+		$$renderer.push(`<div class="bills-card-container svelte-1i9o3mz" tabindex="-1" role="region" aria-label="Kućni računi"${attr_style("", { "min-height": `${stringify(store_get($$store_subs ??= {}, "$itemHeight", itemHeight))}px` })}><div class="dashboard-header svelte-1i9o3mz"><div class="header-left svelte-1i9o3mz"><div class="widget-icon svelte-1i9o3mz">`);
+		Icon($$renderer, {
+			icon: "mdi:receipt-text",
+			height: "1.15rem"
+		});
+		$$renderer.push(`<!----></div> <div class="widget-title-group svelte-1i9o3mz"><span class="widget-title svelte-1i9o3mz">${escape_html(sel?.name || store_get($$store_subs ??= {}, "$lang", lang)("bills") || "Kućni računi")}</span> <span class="month-label svelte-1i9o3mz">${escape_html(getMonthLabel(selectedMonth))}</span></div></div> <div class="header-right svelte-1i9o3mz"><div class="month-stepper svelte-1i9o3mz"><button type="button" class="month-nav-btn svelte-1i9o3mz" title="Prethodni mjesec">`);
+		Icon($$renderer, { icon: "mdi:chevron-left" });
+		$$renderer.push(`<!----></button> `);
+		if (selectedMonth !== getCurrentMonthStr()) {
+			$$renderer.push("<!--[0-->");
+			$$renderer.push(`<button type="button" class="month-today-btn svelte-1i9o3mz" title="Vrati na tekući mjesec">Danas</button>`);
+		} else $$renderer.push("<!--[-1-->");
+		$$renderer.push(`<!--]--> <button type="button" class="month-nav-btn svelte-1i9o3mz" title="Sljedeći mjesec">`);
+		Icon($$renderer, { icon: "mdi:chevron-right" });
+		$$renderer.push(`<!----></button></div> <button type="button" class="expand-btn svelte-1i9o3mz" title="Otvori detaljni prozor">`);
+		Icon($$renderer, { icon: "mdi:fullscreen" });
+		$$renderer.push(`<!----></button></div></div> <div class="metrics-grid svelte-1i9o3mz"><div${attr_class("metric-card unpaid svelte-1i9o3mz", void 0, { "has-unpaid": stats().unpaidAmount > 0 })}><div class="metric-icon-wrap svelte-1i9o3mz">`);
+		Icon($$renderer, { icon: "mdi:alert-circle-outline" });
+		$$renderer.push(`<!----></div> <div class="metric-content svelte-1i9o3mz"><span class="metric-label svelte-1i9o3mz">Preostalo za platiti</span> <span class="metric-value svelte-1i9o3mz">${escape_html(formatCurrency(stats().unpaidAmount, currency()))}</span> <span class="metric-sub svelte-1i9o3mz">${escape_html(stats().unpaidCount)}
+          ${escape_html(stats().unpaidCount === 1 ? "račun" : "računa")}</span></div></div> <div class="metric-card paid svelte-1i9o3mz"><div class="metric-icon-wrap svelte-1i9o3mz">`);
+		Icon($$renderer, { icon: "mdi:check-circle-outline" });
+		$$renderer.push(`<!----></div> <div class="metric-content svelte-1i9o3mz"><span class="metric-label svelte-1i9o3mz">Plaćeno ovaj mjesec</span> <span class="metric-value svelte-1i9o3mz">${escape_html(formatCurrency(stats().paidAmount, currency()))}</span> <span class="metric-sub svelte-1i9o3mz">${escape_html(stats().paidCount)} ${escape_html(stats().paidCount === 1 ? "račun" : "računa")}</span></div></div> <div class="metric-card total svelte-1i9o3mz"><div class="metric-icon-wrap svelte-1i9o3mz">`);
+		Icon($$renderer, { icon: "mdi:calculator-variant-outline" });
+		$$renderer.push(`<!----></div> <div class="metric-content svelte-1i9o3mz"><span class="metric-label svelte-1i9o3mz">Ukupno zaduženje</span> <span class="metric-value svelte-1i9o3mz">${escape_html(formatCurrency(stats().totalAmount, currency()))}</span> <span class="metric-sub svelte-1i9o3mz">${escape_html(stats().percentPaid)}% plaćeno</span></div></div></div> <div class="progress-bar-track svelte-1i9o3mz"${attr("title", `${stringify(stats().percentPaid)}% plaćeno`)}><div class="progress-bar-fill svelte-1i9o3mz"${attr_style("", { width: `${stringify(stats().percentPaid)}%` })}></div></div> <div class="actions-and-filters-row svelte-1i9o3mz"><div class="action-buttons svelte-1i9o3mz"><button type="button" class="btn-quick upload svelte-1i9o3mz">`);
+		Icon($$renderer, { icon: "mdi:cloud-upload" });
+		$$renderer.push(`<!----> <span>Učitaj račun</span></button> <button type="button" class="btn-quick outline svelte-1i9o3mz">`);
+		Icon($$renderer, { icon: "mdi:plus" });
+		$$renderer.push(`<!----> <span>Ručni unos</span></button></div> <div class="filter-controls-right svelte-1i9o3mz"><div class="filter-chips svelte-1i9o3mz"><button type="button"${attr_class("filter-chip svelte-1i9o3mz", void 0, { "active": true })}>Svi (${escape_html(stats().totalCount)})</button> <button type="button"${attr_class("filter-chip unpaid svelte-1i9o3mz", void 0, { "active": false })}>Neplaćeni (${escape_html(stats().unpaidCount)})</button> <button type="button"${attr_class("filter-chip paid svelte-1i9o3mz", void 0, { "active": false })}>Plaćeni (${escape_html(stats().paidCount)})</button></div> <div class="view-mode-toggles svelte-1i9o3mz"><button type="button"${attr_class("view-mode-btn svelte-1i9o3mz", void 0, { "active": true })} title="Prikaži račune kronološki">`);
+		Icon($$renderer, { icon: "mdi:format-list-bulleted" });
+		$$renderer.push(`<!----> <span>Svi</span></button> <button type="button"${attr_class("view-mode-btn svelte-1i9o3mz", void 0, { "active": groupByProvider })} title="Grupiraj račune po pružatelju (npr. Uniqa, A1, HEP)">`);
+		Icon($$renderer, { icon: "mdi:domain" });
+		$$renderer.push(`<!----> <span>Po pružatelju</span></button></div></div></div> `);
+		if (sel?.show_breakdown !== false && stats().byType.length > 0) {
+			$$renderer.push("<!--[0-->");
+			$$renderer.push(`<div class="type-overview-container svelte-1i9o3mz"><div class="type-overview-header svelte-1i9o3mz"><span class="type-overview-title svelte-1i9o3mz">Pregled po vrstama troškova</span> `);
+			$$renderer.push("<!--[-1-->");
+			$$renderer.push(`<!--]--></div> <div class="type-chips-scroll svelte-1i9o3mz"><!--[-->`);
+			const each_array_1 = ensure_array_like(stats().byType);
+			for (let $$index = 0, $$length = each_array_1.length; $$index < $$length; $$index++) {
+				let item = each_array_1[$$index];
+				$$renderer.push(`<button type="button"${attr_class("type-chip-card svelte-1i9o3mz", void 0, {
+					"active": filterTypeId === item.type.id,
+					"has-unpaid": item.unpaid > 0,
+					"is-paid": item.hasBill && item.allPaid,
+					"missing": !item.hasBill
+				})}><div class="type-chip-badge svelte-1i9o3mz"${attr_style("", { "background-color": item.type.color })}>`);
+				Icon($$renderer, {
+					icon: item.type.icon || "mdi:receipt-text",
+					height: "1.1rem"
+				});
+				$$renderer.push(`<!----></div> <div class="type-chip-texts svelte-1i9o3mz"><span class="type-chip-name svelte-1i9o3mz">${escape_html(item.type.name)}</span> `);
+				if (item.hasBill) {
+					$$renderer.push("<!--[0-->");
+					if (item.unpaid > 0) {
+						$$renderer.push("<!--[0-->");
+						$$renderer.push(`<span class="type-chip-amt unpaid svelte-1i9o3mz">Za platiti: ${escape_html(formatCurrency(item.unpaid, currency()))}</span>`);
+					} else if (item.paid > 0) {
+						$$renderer.push("<!--[1-->");
+						$$renderer.push(`<span class="type-chip-amt paid svelte-1i9o3mz">Plaćeno: ${escape_html(formatCurrency(item.paid, currency()))}</span>`);
+					} else if (item.type.fixed_amount && item.type.expected_amount) {
+						$$renderer.push("<!--[2-->");
+						$$renderer.push(`<span class="type-chip-amt fixed svelte-1i9o3mz">Iznos: ${escape_html(formatCurrency(item.type.expected_amount, currency()))}</span>`);
+					} else {
+						$$renderer.push("<!--[-1-->");
+						$$renderer.push(`<span class="type-chip-amt missing svelte-1i9o3mz">Nije prispio</span>`);
+					}
+					$$renderer.push(`<!--]-->`);
+				} else if (item.type.fixed_amount && item.type.expected_amount) {
+					$$renderer.push("<!--[1-->");
+					$$renderer.push(`<span class="type-chip-amt fixed svelte-1i9o3mz">Iznos: ${escape_html(formatCurrency(item.type.expected_amount, currency()))}</span>`);
+				} else {
+					$$renderer.push("<!--[-1-->");
+					$$renderer.push(`<span class="type-chip-amt missing svelte-1i9o3mz">Nije prispio</span>`);
+				}
+				$$renderer.push(`<!--]--></div> `);
+				if (!item.hasBill) {
+					$$renderer.push("<!--[0-->");
+					$$renderer.push(`<div class="quick-add-type-btn svelte-1i9o3mz"${attr("title", `Učitaj račun za ${stringify(item.type.name)}`)}>`);
+					Icon($$renderer, { icon: "mdi:plus-circle" });
+					$$renderer.push(`<!----></div>`);
+				} else $$renderer.push("<!--[-1-->");
+				$$renderer.push(`<!--]--></button>`);
+			}
+			$$renderer.push(`<!--]--></div></div>`);
+		} else $$renderer.push("<!--[-1-->");
+		$$renderer.push(`<!--]--> <div class="bills-list-section svelte-1i9o3mz"><div class="bills-list-header svelte-1i9o3mz"><span class="list-title svelte-1i9o3mz">Popis računa za ${escape_html(getMonthLabel(selectedMonth))} `);
+		if (filteredBills().length > 0) {
+			$$renderer.push("<!--[0-->");
+			$$renderer.push(`<span class="count-badge svelte-1i9o3mz">(${escape_html(filteredBills().length)})</span>`);
+		} else $$renderer.push("<!--[-1-->");
+		$$renderer.push(`<!--]--></span></div> `);
+		if (filteredBills().length === 0) {
+			$$renderer.push("<!--[0-->");
+			$$renderer.push(`<div class="empty-bills-box svelte-1i9o3mz">`);
+			Icon($$renderer, {
+				icon: "mdi:invoice-text-outline",
+				class: "empty-bills-icon"
+			});
+			$$renderer.push(`<!----> <span class="empty-bills-text svelte-1i9o3mz">${escape_html("Nema dodanih računa za ovaj mjesec. Učitajte PDF račun ili unesite podatke ručno.")}</span> <button type="button" class="btn-empty-upload svelte-1i9o3mz">`);
+			Icon($$renderer, { icon: "mdi:cloud-upload" });
+			$$renderer.push(`<!----> <span>Učitaj račun za ${escape_html(getMonthLabel(selectedMonth))}</span></button></div>`);
+		} else {
+			$$renderer.push("<!--[-1-->");
+			$$renderer.push(`<div class="bills-list svelte-1i9o3mz"><!--[-->`);
+			const each_array_4 = ensure_array_like(filteredBills());
+			for (let $$index_3 = 0, $$length = each_array_4.length; $$index_3 < $$length; $$index_3++) {
+				let bill = each_array_4[$$index_3];
+				renderBillRow($$renderer, bill);
+			}
+			$$renderer.push(`<!--]--></div>`);
+		}
+		$$renderer.push(`<!--]--></div></div>  `);
+		if (showBillForm) {
+			$$renderer.push("<!--[0-->");
+			BillFormModal($$renderer, {
+				isOpen: showBillForm,
+				bill: activeBillToEdit,
+				defaultMonth: selectedMonth,
+				onClose: () => {
+					showBillForm = false;
+					activeBillToEdit = void 0;
+				}
+			});
+		} else $$renderer.push("<!--[-1-->");
+		$$renderer.push(`<!--]--> `);
+		$$renderer.push("<!--[-1-->");
+		$$renderer.push(`<!--]-->`);
+		if ($$store_subs) unsubscribe_stores($$store_subs);
+	});
+}
+//#endregion
 //#region src/lib/Main/CustomCard.svelte
 function CustomCard($$renderer, $$props) {
 	$$renderer.component(($$renderer) => {
 		var $$store_subs;
 		let { sel, sectionName = void 0, preview = false } = $$props;
-		let cardMeta = derived(() => store_get($$store_subs ??= {}, "$customCardsStore", customCardsStore).find((c) => c.tag === sel?.card_type || c.file === sel?.card_file || c.id === sel?.card_type || c.id === sel?.id_card || c.sub_cards?.some((s) => s.tag === sel?.card_type)) || store_get($$store_subs ??= {}, "$customCardsStore", customCardsStore)[0]);
+		let cardMeta = derived(() => store_get($$store_subs ??= {}, "$customCardsStore", customCardsStore).find((c) => c.tag === sel?.card_type || c.file === sel?.card_file || c.id === sel?.card_type || c.id === sel?.id_card || c.tag === sel?.card_type?.replace(/-bundle$/, "") || c.sub_cards?.some((s) => s.tag === sel?.card_type)) || store_get($$store_subs ??= {}, "$customCardsStore", customCardsStore)[0]);
 		let tagName = derived(() => sel?.card_type || cardMeta()?.tag || "washing-machine-card");
 		derived(() => sel?.card_file || cardMeta()?.file || `${tagName()}.js`);
 		$$renderer.push(`<div${attr_class("custom-card-wrapper svelte-1cu0c4a", void 0, { "edit-mode": store_get($$store_subs ??= {}, "$editMode", editMode) && !preview })}${attr("role", store_get($$store_subs ??= {}, "$editMode", editMode) && !preview ? "button" : void 0)}${attr("tabindex", store_get($$store_subs ??= {}, "$editMode", editMode) && !preview ? 0 : -1)}>`);
@@ -1603,39 +2258,45 @@ function Content($$renderer, $$props) {
 				sel: item,
 				sectionName
 			});
-		} else if (item?.type === "custom_card") {
+		} else if (item?.type === "bills") {
 			$$renderer.push("<!--[4-->");
+			Bills($$renderer, {
+				sel: item,
+				sectionName
+			});
+		} else if (item?.type === "custom_card") {
+			$$renderer.push("<!--[5-->");
 			CustomCard($$renderer, {
 				sel: item,
 				sectionName
 			});
 		} else if (item?.type === "entities") {
-			$$renderer.push("<!--[5-->");
+			$$renderer.push("<!--[6-->");
 			Entities($$renderer, {
 				sel: item,
 				sectionName
 			});
 		} else if (item?.type === "spotify_player") {
-			$$renderer.push("<!--[6-->");
+			$$renderer.push("<!--[7-->");
 			SpotifyPlayer($$renderer, {
 				sel: item,
 				sectionName
 			});
 		} else if (item?.type === "spotify_player_large") {
-			$$renderer.push("<!--[7-->");
+			$$renderer.push("<!--[8-->");
 			SpotifyPlayer($$renderer, {
 				sel: item,
 				sectionName,
 				large: true
 			});
 		} else if (item?.type === "conditional_media") {
-			$$renderer.push("<!--[8-->");
+			$$renderer.push("<!--[9-->");
 			ConditionalMedia($$renderer, { sel: item });
 		} else if (item?.type === "picture_elements") {
-			$$renderer.push("<!--[9-->");
+			$$renderer.push("<!--[10-->");
 			PictureElements($$renderer, { sel: item });
 		} else if (item?.type === "camera") {
-			$$renderer.push("<!--[10-->");
+			$$renderer.push("<!--[11-->");
 			Camera($$renderer, {
 				sel: item,
 				responsive: false,
@@ -1643,7 +2304,7 @@ function Content($$renderer, $$props) {
 				controls: false
 			});
 		} else if (item?.type === "empty") {
-			$$renderer.push("<!--[11-->");
+			$$renderer.push("<!--[12-->");
 			Empty($$renderer, { sel: item });
 		} else {
 			$$renderer.push("<!--[-1-->");
@@ -2010,6 +2671,11 @@ function Index($$renderer, $$props) {
     `;
 		}
 		function itemStyles(type, item, gridPos) {
+			if (type === "bills") return `
+				grid-column: 1 / -1;
+				width: 100%;
+				display: block;
+			`;
 			if ([
 				"conditional_media",
 				"picture_elements",
@@ -2184,21 +2850,32 @@ function Index($$renderer, $$props) {
 					$$renderer.push(`<!----></div>`);
 				}
 				$$renderer.push(`<!--]--></div>`);
+			} else if (section?.type === "bills") {
+				$$renderer.push("<!--[3-->");
+				SectionHeader($$renderer, {
+					view,
+					section
+				});
+				$$renderer.push(`<!----> <div class="bills-section svelte-z5t3v5">`);
+				Bills($$renderer, { sel: section });
+				$$renderer.push(`<!----></div>`);
 			} else {
 				$$renderer.push("<!--[-1-->");
 				const empty = store_get($$store_subs ??= {}, "$editMode", editMode) && !section?.items?.length;
+				const hasBills = section?.items?.some((it) => it?.type === "bills");
 				const gridMap = computeGridPositions(section?.items ?? [], store_get($$store_subs ??= {}, "$buttonTemplateStore", buttonTemplateStore).definitions);
 				const maxCol = gridMap.size > 0 ? Math.max(1, ...[...gridMap.values()].map((p) => p.col)) : 1;
 				SectionHeader($$renderer, {
 					view,
 					section
 				});
-				$$renderer.push(`<!----> <div class="items svelte-z5t3v5"${attr_style(sectionStyles(section?.type, store_get($$store_subs ??= {}, "$editMode", editMode), store_get($$store_subs ??= {}, "$motion", motion), empty), { "grid-template-columns": maxCol > 1 ? `repeat(${maxCol}, minmax(0, var(--square-size)))` : void 0 })}><!--[-->`);
+				$$renderer.push(`<!----> <div${attr_class("items svelte-z5t3v5", void 0, { "has-full-width-item": hasBills })}${attr_style(sectionStyles(section?.type, store_get($$store_subs ??= {}, "$editMode", editMode), store_get($$store_subs ??= {}, "$motion", motion), empty), { "grid-template-columns": hasBills ? "1fr" : maxCol > 1 ? `repeat(${maxCol}, minmax(0, var(--square-size)))` : void 0 })}><!--[-->`);
 				const each_array_8 = ensure_array_like(section?.items ?? []);
 				for (let $$index_7 = 0, $$length = each_array_8.length; $$index_7 < $$length; $$index_7++) {
 					let item = each_array_8[$$index_7];
 					const gridPos = gridMap.get(item?.id) ?? gridMap.get(String(item?.id));
 					$$renderer.push(`<div${attr("data-id", item?.id)}${attr_class("item svelte-z5t3v5", void 0, {
+						"item-full-width": item?.type === "bills",
 						"item-square": isItemSquare(item, store_get($$store_subs ??= {}, "$buttonTemplateStore", buttonTemplateStore).definitions),
 						"item-medium": isItemMedium(item, store_get($$store_subs ??= {}, "$buttonTemplateStore", buttonTemplateStore).definitions)
 					})} tabindex="-1"${attr_style(itemStyles(item?.type, item, gridPos))}>`);

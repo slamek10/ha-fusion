@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'fs/promises';
+import { readFile, writeFile, mkdir } from 'fs/promises';
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import path from 'path';
@@ -501,6 +501,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 			// Save file
 			const saveName = detectedFileName || `${repoName.toLowerCase()}.js`;
+			await mkdir(CARDS_DIR, { recursive: true });
 			await writeFile(path.join(CARDS_DIR, saveName), jsContent, 'utf8');
 
 			const details = detectCardDetails(jsContent, saveName, repoName, tag);
@@ -543,6 +544,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			const originalName = path.basename(parsedUrl.pathname) || 'custom-card.js';
 			const saveName = originalName.endsWith('.js') ? originalName : `${originalName}.js`;
 
+			await mkdir(CARDS_DIR, { recursive: true });
 			await writeFile(path.join(CARDS_DIR, saveName), jsContent, 'utf8');
 
 			const details = detectCardDetails(jsContent, saveName, originalName, tag);

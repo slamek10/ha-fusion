@@ -1,7 +1,7 @@
 import { error, json } from "@sveltejs/kit";
-import { readFile, writeFile } from "fs/promises";
-import path from "path";
+import { mkdir, readFile, writeFile } from "fs/promises";
 import { existsSync } from "fs";
+import path from "path";
 //#region src/routes/_api/custom_cards/install/+server.ts
 var METADATA_FILE = "./data/custom_cards.json";
 var CARDS_DIR = "./data/custom_cards";
@@ -264,10 +264,23 @@ function detectCardDetails(jsContent, saveName, repoName, customTag) {
 		},
 		subCards: BUBBLE_SUB_CARDS
 	};
+	const customCardsMatch = jsContent.match(/customCards\.push\s*\(\s*\{([^}]+)\}/i);
+	let ccTag = "";
+	let ccName = "";
+	let ccDesc = "";
+	if (customCardsMatch) {
+		const block = customCardsMatch[1];
+		const typeMatch = block.match(/type\s*:\s*['"]([^'"]+)['"]/i);
+		const nameMatch = block.match(/name\s*:\s*['"]([^'"]+)['"]/i);
+		const descMatch = block.match(/description\s*:\s*['"]([^'"]+)['"]/i);
+		if (typeMatch) ccTag = typeMatch[1].replace(/^custom:/, "");
+		if (nameMatch) ccName = nameMatch[1];
+		if (descMatch) ccDesc = descMatch[1];
+	}
 	const cardMatches = [...jsContent.matchAll(/['"]([a-z0-9-]+-card)['"]/gi)].map((m) => m[1]);
 	const uniqueCards = [...new Set(cardMatches)].filter((t) => !t.startsWith("hui-") && !t.includes("editor"));
 	const tagMatch = jsContent.match(/customElements\.define\s*\(\s*['"]([a-z0-9-]+-card)['"]/i) || jsContent.match(/customElements\.define\s*\(\s*['"]([a-z0-9-]+)['"]/i);
-	const detectedTag = customTag || uniqueCards[0] || (tagMatch ? tagMatch[1] : saveName.replace(/\.js$/, ""));
+	const detectedTag = customTag || ccTag || uniqueCards[0] || (tagMatch ? tagMatch[1] : saveName.replace(/\.js$/, ""));
 	const cardId = detectedTag.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
 	const subCards = uniqueCards.length > 1 ? uniqueCards.map((t) => ({
 		tag: t,
@@ -276,9 +289,9 @@ function detectCardDetails(jsContent, saveName, repoName, customTag) {
 	})) : void 0;
 	return {
 		cardId,
-		cardName: detectedTag.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+		cardName: ccName || detectedTag.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
 		detectedTag,
-		description: "",
+		description: ccDesc || "",
 		defaultConfig: { type: `custom:${detectedTag}` },
 		subCards
 	};
@@ -413,6 +426,7 @@ var POST = async ({ request }) => {
 				return error(404, `Nije moguće pronaći .js datoteku u repozitoriju "${author}/${repoName}". Molimo unesite direktan .js URL do kartice.`);
 			}
 			const saveName = detectedFileName || `${repoName.toLowerCase()}.js`;
+			await mkdir(CARDS_DIR, { recursive: true });
 			await writeFile(path.join(CARDS_DIR, saveName), jsContent, "utf8");
 			const details = detectCardDetails(jsContent, saveName, repoName, tag);
 			let cards = [];
@@ -446,6 +460,7 @@ var POST = async ({ request }) => {
 			const parsedUrl = new URL(downloadUrl);
 			const originalName = path.basename(parsedUrl.pathname) || "custom-card.js";
 			const saveName = originalName.endsWith(".js") ? originalName : `${originalName}.js`;
+			await mkdir(CARDS_DIR, { recursive: true });
 			await writeFile(path.join(CARDS_DIR, saveName), jsContent, "utf8");
 			const details = detectCardDetails(jsContent, saveName, originalName, tag);
 			let cards = [];

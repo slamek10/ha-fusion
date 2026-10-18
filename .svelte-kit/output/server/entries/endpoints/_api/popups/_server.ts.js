@@ -1,7 +1,7 @@
 import { error, json } from "@sveltejs/kit";
 import { readFile, readdir } from "fs/promises";
-import * as yaml from "js-yaml";
 import path from "path";
+import * as yaml from "js-yaml";
 //#region src/routes/_api/popups/+server.ts
 var DEFAULT_POPUP_DIRS = [
 	"/Volumes/config/popup",

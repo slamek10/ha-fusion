@@ -17,6 +17,7 @@
 	import Icon from '@iconify/svelte';
 	import WasteCollectionSettings from '$lib/Settings/WasteCollectionSettings.svelte';
 	import CustomCardsSettings from '$lib/Settings/CustomCardsSettings.svelte';
+	import BillsSettings from '$lib/Settings/BillsSettings.svelte';
 
 	let {
 		data,
@@ -28,7 +29,7 @@
 		languages: { id: string; label: string }[];
 	} = $props();
 
-	let activeTab: 'main' | 'waste' | 'cards' = $state('main');
+	let activeTab: 'main' | 'waste' | 'cards' | 'bills' = $state('main');
 	let formElement: HTMLFormElement = $state(undefined as any);
 	let timeout: ReturnType<typeof setTimeout> | null;
 	let responseCode: number | undefined = $state(undefined);
@@ -141,7 +142,7 @@
 <svelte:window onkeydown={handleKeydown} />
 
 {#if isOpen}
-	<Modal size={activeTab === 'waste' || activeTab === 'cards' ? 'large' : undefined}>
+	<Modal size={activeTab === 'waste' || activeTab === 'cards' || activeTab === 'bills' ? 'large' : undefined}>
 		{#snippet title()}
 			<div class="settings-header">
 				<h1>{$lang('settings')}</h1>
@@ -155,6 +156,16 @@
 					>
 						<Icon icon="clarity:settings-solid" height="1.1rem" />
 						<span>{$lang('main_settings') || 'Main settings'}</span>
+					</button>
+					<button
+						type="button"
+						class="settings-tab"
+						class:active={activeTab === 'bills'}
+						onclick={() => (activeTab = 'bills')}
+						use:Ripple={$ripple}
+					>
+						<Icon icon="mdi:receipt-text" height="1.1rem" />
+						<span>{$lang('bills') || 'Bills'}</span>
 					</button>
 					<button
 						type="button"
@@ -248,6 +259,8 @@
 			<WasteCollectionSettings />
 		{:else if activeTab === 'cards'}
 			<CustomCardsSettings />
+		{:else if activeTab === 'bills'}
+			<BillsSettings />
 		{/if}
 	</Modal>
 {/if}

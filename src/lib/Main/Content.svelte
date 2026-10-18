@@ -7,6 +7,7 @@
 	import Empty from '$lib/Main/Empty.svelte';
 	import DaysSince from '$lib/Main/DaysSince.svelte';
 	import WasteCollection from '$lib/Main/WasteCollection.svelte';
+	import Bills from '$lib/Main/Bills.svelte';
 	import CustomCard from '$lib/Main/CustomCard.svelte';
 	import Entities from '$lib/Main/Entities.svelte';
 	import SpotifyPlayer from '$lib/Main/SpotifyPlayer.svelte';
@@ -22,6 +23,8 @@
 	<DaysSince sel={item} {sectionName} />
 {:else if item?.type === 'waste_collection'}
 	<WasteCollection sel={item} {sectionName} />
+{:else if item?.type === 'bills'}
+	<Bills sel={item} {sectionName} />
 {:else if item?.type === 'custom_card'}
 	<CustomCard sel={item} {sectionName} />
 {:else if item?.type === 'entities'}
